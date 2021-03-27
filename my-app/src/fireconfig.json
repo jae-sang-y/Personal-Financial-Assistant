@@ -1,0 +1,9 @@
+{
+  "apiKey": "AIzaSyBbJA2VtzeSGfczXt74GewD4Xp0C1M2S7I",
+  "projectId": "personal-financial-assistant",
+  "databaseURL": "https://personal-financial-assistant-default-rtdb.firebaseio.com/",
+  "authDomain": "personal-financial-assistant.firebaseapp.com",
+  "storageBucket": "personal-financial-assistant.appspot.com",
+  "appId": "1:969532485100:web:9e09a41cb2111d76aba4c9",
+  "messagingSenderId": "969532485100"
+}
