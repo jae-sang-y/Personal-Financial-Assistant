@@ -11,6 +11,7 @@ import { FirebaseDatabaseProvider } from '@react-firebase/database';
 
 import FileUploader from './components/FileUploader';
 import DataViewer from './components/DataViewer';
+import TagManager from './components/TagManager';
 import { Button, ButtonGroup } from 'react-bootstrap';
 import { BsCloudUpload } from 'react-icons/bs';
 
@@ -131,10 +132,11 @@ class App extends Component {
               />
               <div
                 className='border d-flex flex-column w-100 m-0'
-                style={{ overflowY: 'scroll', height: 'calc(100vh - 3rem)' }}
+                style={{ overflowY: 'auto', height: 'calc(100vh - 3rem)' }}
                 children={
                   {
                     DataViewer: <DataViewer />,
+                    TagManager: <TagManager />,
                   }[this.state.page]
                 }
               />
