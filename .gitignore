@@ -86,4 +86,5 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
-my-app/public/mydata.txt
+fireconfig.json
+.firebase
