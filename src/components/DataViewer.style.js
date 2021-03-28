@@ -6,9 +6,8 @@ const Cell = {
     display: inline-block;
     overflow: hidden;
     white-space: nowrap;
-    width: 10rem;
+    width: 8.2rem;
     text-align: right !important;
-    font-variant-numeric: tabular-nums lining-nums;
   `,
   balance: styled.span`
     display: inline-block;
@@ -16,7 +15,6 @@ const Cell = {
     white-space: nowrap;
     width: 5rem;
     text-align: right !important;
-    font-variant-numeric: tabular-nums;
   `,
   delta: styled.span`
     display: inline-block;
@@ -24,21 +22,24 @@ const Cell = {
     white-space: nowrap;
     width: 5rem;
     text-align: right !important;
-    font-variant-numeric: tabular-nums;
   `,
   note: styled.span`
     display: inline-block;
     overflow: hidden;
     white-space: nowrap;
     width: 8rem;
-    font-variant-numeric: tabular-nums;
   `,
   protocol: styled.span`
     display: inline-block;
     overflow: hidden;
     white-space: nowrap;
     width: 4rem;
-    font-variant-numeric: tabular-nums;
+  `,
+  tag: styled.span`
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 4rem;
   `,
 };
 

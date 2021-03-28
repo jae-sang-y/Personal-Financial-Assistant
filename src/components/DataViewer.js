@@ -5,9 +5,29 @@ import 'firebase/database';
 import { IfFirebaseAuthed } from '@react-firebase/auth';
 import { FirebaseDatabaseNode } from '@react-firebase/database';
 
-import { Button, ButtonGroup, Container } from 'react-bootstrap';
+import { Button, ButtonGroup } from 'react-bootstrap';
 import { Cell } from './DataViewer.style';
 import moment from 'moment';
+
+const ReceiptButton = (props) => {
+  if (props.children === null)
+    return (
+      <Button
+        className='p-0'
+        variant='outline-secondary'
+        size='sm'
+        children='추가'
+      />
+    );
+  return (
+    <Button
+      className='p-0'
+      variant='outline-success'
+      size='sm'
+      children='보기'
+    />
+  );
+};
 
 const TransactionOnTable = ({ data }) => {
   const number_format = new Intl.NumberFormat('ko-KR', {
@@ -31,7 +51,15 @@ const TransactionOnTable = ({ data }) => {
   const format_timestamp = (old_timestamp) => {
     const time = moment(old_timestamp, 'YYYY-MM-DDHH:mm:ss');
     if (!time.isValid()) return 'Not Valid';
-    return time.format('MM-DD HH/mm/ss ddd');
+    return time
+      .format('MM[/]DD[(]ddd[)] HH[:]mm[:]ss')
+      .replace('Sun', '일')
+      .replace('Mon', '월')
+      .replace('Tue', '화')
+      .replace('Wed', '수')
+      .replace('Thu', '목')
+      .replace('Fri', '금')
+      .replace('Sat', '토');
   };
 
   return data.value === null ? (
@@ -44,11 +72,12 @@ const TransactionOnTable = ({ data }) => {
     >
       <thead>
         <tr>
-          <th children='시간' className='border' />
-          <th children='잔액' className='border' />
-          <th children='변동' className='border' />
-          <th children='노트' className='border' />
-          <th children='매체' className='border' />
+          <th children='시간' className='border text-monospace' />
+          <th children='잔액' className='border text-monospace' />
+          <th children='변동' className='border text-monospace' />
+          <th children='노트' className='border text-monospace' />
+          <th children='태그' className='border text-monospace' />
+          <th children='영수증' className='border text-monospace' />
         </tr>
       </thead>
       <tbody>
@@ -59,9 +88,13 @@ const TransactionOnTable = ({ data }) => {
               [Cell.balance, number_format.format(tran.balance)],
               [Cell.delta, format_curr(tran.delta)],
               [Cell.note, tran.note],
-              [Cell.protocol, tran.protocol],
+              [Cell.tag, tran.tag || '-'],
+              [ReceiptButton, null],
             ].map(([Com, content]) => (
-              <td children={<Com children={content} />} className='border' />
+              <td
+                children={<Com children={content} pk={tran.timestamp} />}
+                className='border'
+              />
             ))}
           </tr>
         ))}
@@ -90,17 +123,17 @@ class DataViewer extends Component {
           <FirebaseDatabaseNode
             path='month_of_transactions/'
             children={(d) => (
-              <ButtonGroup toggle>
-                <>
-                  {d.value &&
-                    Object.entries(d.value).map(([ym]) => (
-                      <Button
-                        size='sm'
-                        children={ym}
-                        onClick={this.YmButtonOnClick.bind(this, ym)}
-                      />
-                    ))}
-                </>
+              <ButtonGroup toggle className='my-3'>
+                <Button size='sm' children='조회연월' variant='outline-dark' />
+                {d.value &&
+                  Object.entries(d.value).map(([ym]) => (
+                    <Button
+                      size='sm'
+                      variant='outline-dark'
+                      children={ym}
+                      onClick={this.YmButtonOnClick.bind(this, ym)}
+                    />
+                  ))}
               </ButtonGroup>
             )}
           />
@@ -109,8 +142,6 @@ class DataViewer extends Component {
             <>Please select taget date</>
           ) : (
             <div className='w-100 d-flex flex-column align-items-center'>
-              <h3 children={`${this.state.targetYM} 내역`} />
-              <br />
               <FirebaseDatabaseNode
                 path={`transactions/${this.state.targetYM}`}
                 children={(d) => <TransactionOnTable data={d} />}

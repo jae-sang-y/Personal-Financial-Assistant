@@ -8,6 +8,7 @@ import {
   FirebaseDatabaseMutation,
 } from '@react-firebase/database';
 import { TextDecoder } from 'text-encoding';
+import { Modal } from 'react-bootstrap';
 
 class FileUploader extends Component {
   state = {
@@ -57,6 +58,8 @@ class FileUploader extends Component {
             balance: parseInt(cells[5].replace(/,/g, '')),
             note: cells[6],
             memo: cells[7],
+            tag: null,
+            receipt: null,
           });
         }
         k += 1;
@@ -74,41 +77,57 @@ class FileUploader extends Component {
       }
       await this.set_tranOnMonth(new_tranOnMonth);
       await this.set_monthOfTran(new_monthOfTran);
+      this.props.onHide();
     };
     reader.readAsArrayBuffer(e.target.files[0]);
   }
 
   render() {
     return (
-      <div>
-        <IfFirebaseAuthed>
-          <input type='file' onChange={(e) => this.uploadFile(e)} />
-          <FirebaseDatabaseNode
-            path='transactions/'
-            children={(d) => this.updateTranOnMonth(d)}
-          />
-          <FirebaseDatabaseNode
-            path='month_of_transactions/'
-            children={(d) => this.updateMonthOfTran(d)}
-          />
-          <FirebaseDatabaseMutation
-            type='set'
-            path='transactions'
-            children={({ runMutation }) => {
-              this.set_tranOnMonth = runMutation;
-              return '';
-            }}
-          />
-          <FirebaseDatabaseMutation
-            type='set'
-            path='month_of_transactions'
-            children={({ runMutation }) => {
-              this.set_monthOfTran = runMutation;
-              return '';
-            }}
-          />
-        </IfFirebaseAuthed>
-      </div>
+      <Modal
+        show={this.props.show}
+        onHide={this.props.onHide}
+        backdrop='static'
+      >
+        <Modal.Header closeButton>
+          <Modal.Title children='거래내역 업로드하기' />
+        </Modal.Header>
+        <div className='form-control'>
+          <IfFirebaseAuthed>
+            <input
+              type='file'
+              onChange={(e) => this.uploadFile(e)}
+              id='fileUploader'
+              style={{ height: '30rem' }}
+            />
+            <FirebaseDatabaseNode
+              path='transactions/'
+              children={(d) => this.updateTranOnMonth(d)}
+            />
+            <FirebaseDatabaseNode
+              path='month_of_transactions/'
+              children={(d) => this.updateMonthOfTran(d)}
+            />
+            <FirebaseDatabaseMutation
+              type='set'
+              path='transactions'
+              children={({ runMutation }) => {
+                this.set_tranOnMonth = runMutation;
+                return '';
+              }}
+            />
+            <FirebaseDatabaseMutation
+              type='set'
+              path='month_of_transactions'
+              children={({ runMutation }) => {
+                this.set_monthOfTran = runMutation;
+                return '';
+              }}
+            />
+          </IfFirebaseAuthed>
+        </div>
+        <Modal.Footer />
+      </Modal>
     );
   }
 }
