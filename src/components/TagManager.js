@@ -1,7 +1,16 @@
 import { Component, forwardRef } from 'react';
 import {
+  Card,
+  ListGroup,
+  Button,
+  FormControl,
+  DropdownButton,
+  Dropdown,
+  ButtonGroup,
+  Form,
+} from 'react-bootstrap';
 
-import { BsCloudUpload, BsFillTrashFill } from 'react-icons/bs';
+import { BsFillTrashFill } from 'react-icons/bs';
 
 const listgroup_props = {
   variant: 'flush',
@@ -108,7 +117,76 @@ class TagManager extends Component {
         new_tags[key] = value;
       });
     this.setState({ tags: new_tags });
-    console.log(tag_name, new_tags);
+  }
+
+  chooseTag(tag_name) {
+    let new_filters = [];
+    const new_target_tag_name = tag_name;
+    const target_tag_entry = Object.entries(this.state.tags).find(
+      ([key, tag]) => tag.name === tag_name
+    );
+    if (target_tag_entry !== undefined)
+      new_filters = target_tag_entry[1].filters;
+    this.setState({
+      filters: new_filters,
+      target_tag_name: new_target_tag_name,
+    });
+  }
+
+  updateFilter() {
+    const new_tags = {};
+    Object.entries(this.state.tags)
+      .map(([key, value]) => {
+        console.log([key, value], this.state.target_tag_name);
+        if (value.name === this.state.target_tag_name)
+          return [key, { name: value.name, filters: this.state.filters }];
+        else return [key, value];
+      })
+      .forEach(([key, value]) => {
+        new_tags[key] = value;
+      });
+    this.setState({
+      tags: new_tags,
+    });
+  }
+
+  changeFilter(filter, new_filter) {
+    const new_filters = this.state.filters.map(({ type, value }) => {
+      if (type === filter.type && value === filter.value)
+        return {
+          type: new_filter.type || type,
+          value: new_filter.value || value,
+        };
+      else return { type: type, value: value };
+    });
+    this.setState(
+      {
+        filters: new_filters,
+      },
+      () => this.updateFilter()
+    );
+  }
+
+  deleteFilter(filter) {
+    const new_filters = this.state.filters.filter(
+      ({ type, value }) => type !== filter.type || value !== filter.value
+    );
+    this.setState(
+      {
+        filters: new_filters,
+      },
+      () => this.updateFilter()
+    );
+  }
+  insertFilter(filter) {
+    const new_filters = Array.from(this.state.filters);
+    new_filters.push(filter);
+    this.setState(
+      {
+        filters: new_filters,
+      },
+      () => this.updateFilter()
+    );
   }
 
   render() {
@@ -120,7 +198,12 @@ class TagManager extends Component {
             <ListGroup {...listgroup_props}>
               {Object.entries(this.state.tags).map(([key, value]) => (
                 <ListGroup.Item key={key} className='d-flex'>
-                  <span children={value.name} className='ml-auto' />
+                  <span
+                    children={value.name}
+                    style={{ cursor: 'pointer' }}
+                    className='ml-auto'
+                    onClick={() => this.chooseTag(value.name)}
+                  />
                   <Button
                     className='ml-auto pt-0 px-1'
                     children={<BsFillTrashFill />}
@@ -133,17 +216,47 @@ class TagManager extends Component {
             </ListGroup>
           </Card>
           <Card {...card_props}>
-            <h5 children='태그' className='font-weight-bold' />
+            <h5
+              children={`${this.state.target_tag}의 필터`}
+              className='font-weight-bold'
+            />
             <ListGroup {...listgroup_props}>
-              <ListGroup.Item>Cras justo odio</ListGroup.Item>
-              <ListGroup.Item>Dapibus ac facilisis in</ListGroup.Item>
-              <ListGroup.Item>Vestibulum at eros</ListGroup.Item>
+              {this.state.filters.map((filter, pk) => (
+                <FilterItem
+                  pk={pk}
+                  filter={filter}
+                  deleteFilter={(e) => this.deleteFilter(e)}
+                  changeFilter={(e, s) => this.changeFilter(e, s)}
+                />
+              ))}
             </ListGroup>
           </Card>
         </div>
         <div className='w-100 d-flex flex-row' style={{ height: '30rem' }}>
-          <div className='bg-success w-50 h-100'></div>
-          <div className='bg-danger w-50 h-100'></div>
+          <div className='w-50 h-100 p-3'>
+            <FormControl
+              className='w-100 h-100'
+              placeholder='태그 추가'
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  this.insertTag(e.target.value);
+                  e.target.value = '';
+                }
+              }}
+            />
+          </div>
+          <div className='w-50 h-100 p-3'>
+            <FormControl
+              className='w-100 h-100'
+              placeholder='필터 추가'
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  this.insertFilter({ type: '키워드', value: e.target.value });
+                  e.target.value = '';
+                }
+              }}
+            />
+          </div>
         </div>
       </div>
     );
