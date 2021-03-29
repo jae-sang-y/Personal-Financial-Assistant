@@ -108,9 +108,6 @@ class DataViewer extends Component {
     targetYM: '2021-02',
     tranOnMonth: {},
   };
-  constructor(props) {
-    super(props);
-  }
 
   YmButtonOnClick(ym, e) {
     this.setState({ targetYM: ym });

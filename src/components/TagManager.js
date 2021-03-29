@@ -1,17 +1,9 @@
-import { Component } from 'react';
-import { Card, ListGroup, Button } from 'react-bootstrap';
+import { Component, forwardRef } from 'react';
+import {
 
 import { BsCloudUpload, BsFillTrashFill } from 'react-icons/bs';
 
 const listgroup_props = {
-  variant: 'flush',
-  style: {
-    height: 'calc(100vh - 12rem)',
-    overflowY: 'auto',
-  },
-};
-
-const listgroupitem_props = {
   variant: 'flush',
   style: {
     height: 'calc(100vh - 12rem)',
@@ -26,23 +18,88 @@ const card_props = {
   className: 'mx-3',
 };
 
+const FilterItemValueMenu = forwardRef((props, ref) => {
+  return (
+    <div ref={ref}>
+      <Form.Control
+        autoFocus
+        className='mx-3 my-2 w-auto'
+        placeholder='Type to filter...'
+        onKeyDown={(e) => {
+          if (e.key === 'Enter')
+            props.onChange({ target: { value: e.target.value } });
+        }}
+      />
+    </div>
+  );
+});
+const FilterItem = ({ filter, deleteFilter, changeFilter, key }) => (
+  <ListGroup.Item key={key}>
+    <ButtonGroup className='w-100 border rounded border-secondary'>
+      <DropdownButton
+        className='border-right-0'
+        variant='outline-secondary'
+        bsPrefix='border-0 btn'
+        title={filter.type}
+        onClick={(e) => {
+          if (e.target.text !== undefined)
+            changeFilter(filter, { type: e.target.text });
+        }}
+      >
+        <Dropdown.Item href='#' children='키워드' key='1' />
+        <Dropdown.Item href='#' children='정규식' key='2' />
+      </DropdownButton>
+      <DropdownButton
+        className='px-0 flex-fill'
+        variant='outline-secondary'
+        title={filter.value}
+        bsPrefix='w-100 border-top-0 border-bottom-0 rounded-0 btn'
+      >
+        <Dropdown.Menu
+          as={FilterItemValueMenu}
+          onChange={(e) => changeFilter(filter, { value: e.target.value })}
+        />
+      </DropdownButton>
+      <Button
+        className='pt-0'
+        style={{ maxWidth: '2rem' }}
+        children={<BsFillTrashFill />}
+        size='sm'
+        variant='danger'
+        onClick={() => deleteFilter(filter)}
+      />
+    </ButtonGroup>
+  </ListGroup.Item>
+);
 class TagManager extends Component {
   state = {
+    target_tag_name: '월급',
     tags: {
       asdasdasd: {
         name: '월급',
-        filters: [{ type: 'keyword', value: '급여고정상여' }],
+        filters: [{ type: '키워드', value: '급여고정상여' }],
       },
       asdasdasd1: {
         name: '세탁',
-        filters: [{ type: 'keyword', value: '세탁' }],
+        filters: [{ type: '키워드', value: '세탁' }],
       },
       asdasdasd2: {
         name: '식비',
-        filters: [{ type: 'keyword', value: '마트' }],
+        filters: [{ type: '키워드', value: '마트' }],
       },
     },
+    filters: [{ type: '키워드', value: '급여고정상여' }],
   };
+
+  insertTag(tag_name) {
+    const new_tags = Object.assign({}, this.state.tags);
+    new_tags[new Date().toString()] = {
+      name: tag_name,
+      filters: [],
+    };
+    this.setState({ tags: new_tags });
+  }
+
   deleteTag(tag_name) {
     const new_tags = {};
     Object.entries(this.state.tags)

@@ -50,7 +50,7 @@ class FileUploader extends Component {
           const cells = line.split('|');
           data.push({
             YYYY_MM: cells[1].substr(0, 7),
-            timestamp: cells[1].replace(/[\[\], ]/g, ''),
+            timestamp: cells[1].replace(/\[\], ]/g, ''),
             type: cells[2],
             delta:
               parseInt(cells[4].replace(/,/g, '')) -

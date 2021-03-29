@@ -1,6 +1,5 @@
 import './App.css';
 
-import { Container } from 'react-bootstrap';
 import { Component } from 'react';
 
 import firebase from 'firebase/app';
@@ -12,7 +11,7 @@ import { FirebaseDatabaseProvider } from '@react-firebase/database';
 import FileUploader from './components/FileUploader';
 import DataViewer from './components/DataViewer';
 import TagManager from './components/TagManager';
-import { Button, ButtonGroup } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { BsCloudUpload } from 'react-icons/bs';
 
 const config = require('./fireconfig.json');
@@ -50,9 +49,10 @@ const Navigator = ({ state, setState }) => {
       className='bg-dark w-100 p-2 d-flex align-items-center'
       style={{ height: '3rem' }}
     >
-      {['DataViewer', 'TagManager'].map((text) => (
+      {['DataViewer', 'TagManager'].map((text, pk) => (
         <Button
           active
+          key={pk}
           className={
             'h-100 py-0 px-1 bg-transparent border-0 ' +
             (text === state.page ? 'font-weight-bold' : '')
