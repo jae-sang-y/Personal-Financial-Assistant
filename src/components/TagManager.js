@@ -9,6 +9,10 @@ import {
   ButtonGroup,
   Form,
 } from 'react-bootstrap';
+import {
+  FirebaseDatabaseNode,
+  FirebaseDatabaseMutation,
+} from '@react-firebase/database';
 
 import { BsFillTrashFill } from 'react-icons/bs';
 
@@ -61,7 +65,7 @@ const FilterItem = ({ filter, deleteFilter, changeFilter, key }) => (
       <DropdownButton
         className='px-0 flex-fill'
         variant='outline-secondary'
-        title={filter.value}
+        title={<span style={{ whiteSpace: 'pre' }} children={filter.value} />}
         bsPrefix='w-100 border-top-0 border-bottom-0 rounded-0 btn'
       >
         <Dropdown.Menu
@@ -82,31 +86,23 @@ const FilterItem = ({ filter, deleteFilter, changeFilter, key }) => (
 );
 class TagManager extends Component {
   state = {
-    target_tag_name: '월급',
-    tags: {
-      asdasdasd: {
-        name: '월급',
-        filters: [{ type: '키워드', value: '급여고정상여' }],
-      },
-      asdasdasd1: {
-        name: '세탁',
-        filters: [{ type: '키워드', value: '세탁' }],
-      },
-      asdasdasd2: {
-        name: '식비',
-        filters: [{ type: '키워드', value: '마트' }],
-      },
-    },
-    filters: [{ type: '키워드', value: '급여고정상여' }],
+    target_tag_name: undefined,
+    tags: {},
+    filters: [],
   };
+  set_tags = undefined;
+
+  async syncWithFirebase() {
+    await this.set_tags(this.state.tags);
+  }
 
   insertTag(tag_name) {
     const new_tags = Object.assign({}, this.state.tags);
-    new_tags[new Date().toString()] = {
+    new_tags[tag_name] = {
       name: tag_name,
       filters: [],
     };
-    this.setState({ tags: new_tags });
+    this.setState({ tags: new_tags }, () => this.syncWithFirebase());
   }
 
   deleteTag(tag_name) {
@@ -116,16 +112,20 @@ class TagManager extends Component {
       .forEach(([key, value]) => {
         new_tags[key] = value;
       });
-    this.setState({ tags: new_tags });
+    this.setState({ tags: new_tags }, () => this.syncWithFirebase());
   }
 
   chooseTag(tag_name) {
     let new_filters = [];
     const new_target_tag_name = tag_name;
     const target_tag_entry = Object.entries(this.state.tags).find(
-      ([key, tag]) => tag.name === tag_name
+      ([key, value]) => key === tag_name
     );
-    if (target_tag_entry !== undefined)
+
+    if (
+      target_tag_entry !== undefined &&
+      target_tag_entry[1].filters !== undefined
+    )
       new_filters = target_tag_entry[1].filters;
     this.setState({
       filters: new_filters,
@@ -137,17 +137,19 @@ class TagManager extends Component {
     const new_tags = {};
     Object.entries(this.state.tags)
       .map(([key, value]) => {
-        console.log([key, value], this.state.target_tag_name);
-        if (value.name === this.state.target_tag_name)
-          return [key, { name: value.name, filters: this.state.filters }];
+        if (key === this.state.target_tag_name)
+          return [key, { filters: this.state.filters }];
         else return [key, value];
       })
       .forEach(([key, value]) => {
         new_tags[key] = value;
       });
-    this.setState({
-      tags: new_tags,
-    });
+    this.setState(
+      {
+        tags: new_tags,
+      },
+      () => this.syncWithFirebase()
+    );
   }
 
   changeFilter(filter, new_filter) {
@@ -194,15 +196,26 @@ class TagManager extends Component {
       <div className='d-flex justify-content-center h-100 pt-4 flex-column'>
         <div className='flex-fill d-flex'>
           <Card {...card_props}>
-            <h5 children='태그' className='font-weight-bold' />
+            <h5 children='태그' className='font-weight-bold my-1' />
             <ListGroup {...listgroup_props}>
+              <FirebaseDatabaseNode
+                path='tags/'
+                children={(d) => {
+                  if (
+                    d.value !== null &&
+                    JSON.stringify(this.state.tags) !== JSON.stringify(d.value)
+                  )
+                    this.setState({ tags: d.value });
+                  return '';
+                }}
+              />
               {Object.entries(this.state.tags).map(([key, value]) => (
                 <ListGroup.Item key={key} className='d-flex'>
                   <span
-                    children={value.name}
+                    children={key}
                     style={{ cursor: 'pointer' }}
                     className='ml-auto'
-                    onClick={() => this.chooseTag(value.name)}
+                    onClick={() => this.chooseTag(key)}
                   />
                   <Button
                     className='ml-auto pt-0 px-1'
@@ -217,8 +230,12 @@ class TagManager extends Component {
           </Card>
           <Card {...card_props}>
             <h5
-              children={`${this.state.target_tag}의 필터`}
-              className='font-weight-bold'
+              children={
+                this.state.target_tag_name === undefined
+                  ? '태그를 선택해주세요'
+                  : `${this.state.target_tag_name}의 필터`
+              }
+              className='font-weight-bold my-1'
             />
             <ListGroup {...listgroup_props}>
               {this.state.filters.map((filter, pk) => (
@@ -258,6 +275,14 @@ class TagManager extends Component {
             />
           </div>
         </div>
+        <FirebaseDatabaseMutation
+          type='set'
+          path='tags'
+          children={({ runMutation }) => {
+            this.set_tags = runMutation;
+            return '';
+          }}
+        />
       </div>
     );
   }
