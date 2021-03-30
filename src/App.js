@@ -18,9 +18,9 @@ const config = require('./fireconfig.json');
 
 const Navigator = ({ state, setState }) => {
   if (state === undefined) return '';
-  const SignButton = (isSignedIn) => {
+  const SignButton = ({ isSignedIn }) => {
     let signData = null;
-    if (isSignedIn) {
+    if (isSignedIn === true) {
       signData = {
         onClick: () => {
           firebase.auth().signOut();
@@ -126,20 +126,26 @@ class App extends Component {
                 state={this.state}
                 setState={(d) => this.setState(d)}
               />
-              <FileUploader
-                show={this.state.showFileUploader}
-                onHide={() => this.setState({ showFileUploader: false })}
-              />
-              <div
-                className='border d-flex flex-column w-100 m-0'
-                style={{ overflowY: 'auto', height: 'calc(100vh - 3rem)' }}
-                children={
-                  {
-                    DataViewer: <DataViewer />,
-                    TagManager: <TagManager />,
-                  }[this.state.page]
-                }
-              />
+              {this.state.isSignedIn === true && (
+                <FileUploader
+                  show={this.state.showFileUploader}
+                  onHide={() => this.setState({ showFileUploader: false })}
+                />
+              )}
+              {this.state.isSignedIn === true ? (
+                <div
+                  className='border d-flex flex-column w-100 m-0'
+                  style={{ overflowY: 'auto', height: 'calc(100vh - 3rem)' }}
+                  children={
+                    {
+                      DataViewer: <DataViewer />,
+                      TagManager: <TagManager />,
+                    }[this.state.page]
+                  }
+                />
+              ) : (
+                <span children={'You have to sign up to access data.'} />
+              )}
             </div>
           </FirebaseDatabaseProvider>
         </ImprovedFirebaseAuthProvider>
