@@ -1,4 +1,4 @@
-import { Component, forwardRef } from 'react';
+import { Component } from 'react';
 import {
   Card,
   ListGroup,
@@ -7,7 +7,6 @@ import {
   DropdownButton,
   Dropdown,
   ButtonGroup,
-  Form,
 } from 'react-bootstrap';
 import {
   FirebaseDatabaseNode,
@@ -31,21 +30,6 @@ const card_props = {
   className: 'mx-3',
 };
 
-const FilterItemValueMenu = forwardRef((props, ref) => {
-  return (
-    <div ref={ref}>
-      <Form.Control
-        autoFocus
-        className='mx-3 my-2 w-auto'
-        placeholder='Type to filter...'
-        onKeyDown={(e) => {
-          if (e.key === 'Enter')
-            props.onChange({ target: { value: e.target.value } });
-        }}
-      />
-    </div>
-  );
-});
 const FilterItem = ({ filter, deleteFilter, changeFilter, key }) => (
   <ListGroup.Item key={key}>
     <ButtonGroup className='w-100 border rounded border-secondary'>
@@ -62,17 +46,21 @@ const FilterItem = ({ filter, deleteFilter, changeFilter, key }) => (
         <Dropdown.Item href='#' children='키워드' key='1' />
         <Dropdown.Item href='#' children='정규식' key='2' />
       </DropdownButton>
-      <DropdownButton
+      <Button
         className='px-0 flex-fill'
         variant='outline-secondary'
-        title={<span style={{ whiteSpace: 'pre' }} children={filter.value} />}
+        children={
+          <span style={{ whiteSpace: 'pre' }} children={filter.value} />
+        }
         bsPrefix='w-100 border-top-0 border-bottom-0 rounded-0 btn'
-      >
-        <Dropdown.Menu
-          as={FilterItemValueMenu}
-          onChange={(e) => changeFilter(filter, { value: e.target.value })}
-        />
-      </DropdownButton>
+        onClick={() => {
+          const result = prompt('필터 작성', filter.value);
+          if (result !== null) {
+            changeFilter(filter, { value: result });
+          }
+        }}
+      />
+
       <Button
         className='pt-0'
         style={{ maxWidth: '2rem' }}
