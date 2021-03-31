@@ -112,13 +112,15 @@ class App extends Component {
         <ImprovedFirebaseAuthProvider
           firebase={firebase}
           {...config}
-          onChange={({ isSignedIn, providerId, user }) =>
+          onChange={({ isSignedIn, providerId, user }) => {
             this.setState({
-              isSignedIn: isSignedIn,
-              providerId: providerId,
-              user: user,
-            })
-          }
+              auth: {
+                isSignedIn: isSignedIn,
+                providerId: providerId,
+                user: user,
+              },
+            });
+          }}
         >
           <FirebaseDatabaseProvider firebase={firebase} {...config}>
             <div>
@@ -126,13 +128,13 @@ class App extends Component {
                 state={this.state}
                 setState={(d) => this.setState(d)}
               />
-              {this.state.isSignedIn === true && (
+              {this.state.auth.isSignedIn === true && (
                 <FileUploader
                   show={this.state.showFileUploader}
                   onHide={() => this.setState({ showFileUploader: false })}
                 />
               )}
-              {this.state.isSignedIn === true ? (
+              {this.state.auth.isSignedIn === true ? (
                 <div
                   className='border d-flex flex-column w-100 m-0'
                   style={{ overflowY: 'auto', height: 'calc(100vh - 3rem)' }}
