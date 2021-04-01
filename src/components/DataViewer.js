@@ -23,7 +23,7 @@ const ReceiptButton = (props) => {
         props.children === undefined ? 'outline-secondary' : 'outline-primary'
       }
       size='sm'
-      children={props.children === undefined ? '추가' : '보기'}
+      children={props.children === undefined ? '추가' : '영수증'}
       onClick={() =>
         props.setReceipt({
           tran: props.tran,

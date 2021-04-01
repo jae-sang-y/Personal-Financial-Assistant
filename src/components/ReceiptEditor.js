@@ -45,7 +45,7 @@ class ReceiptEditor extends Component {
     const content = this.state.content;
     content.push({
       name: '',
-      value: 0,
+      value: 1,
       count: 0,
     });
     this.setState({ content: content });
@@ -163,7 +163,7 @@ class ReceiptEditor extends Component {
                       />
                       <td
                         children={number_format.format(value * count)}
-                        className='border text-right'
+                        className='border text-right text-weight-bold'
                         dummy={(sum += value * count)}
                       />
                     </tr>
