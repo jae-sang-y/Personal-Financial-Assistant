@@ -89,3 +89,9 @@ typings/
 fireconfig.json
 .firebase
 build
+
+scrap/.venv
+scrap/.env
+scrap/.idea
+scrap/geckodriver.exe
+scrap/result.json
