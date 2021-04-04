@@ -45,8 +45,8 @@ class ReceiptEditor extends Component {
     const content = this.state.content;
     content.push({
       name: '',
-      value: 1,
-      count: 0,
+      value: 0,
+      count: 1,
     });
     this.setState({ content: content });
   }
@@ -206,7 +206,8 @@ class ReceiptEditor extends Component {
               <Button
                 variant='primary'
                 disabled={
-                  sum + receipt.tran.delta !== 0 && receipt.content.length > 0
+                  sum + Number(receipt.tran.delta) !== 0 &&
+                  receipt.content.length > 0
                 }
                 onClick={() => {
                   this.syncFirebase().then(this.props.onHide);

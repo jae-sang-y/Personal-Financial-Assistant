@@ -20,7 +20,11 @@ const ReceiptButton = (props) => {
     <Button
       className='p-0'
       variant={
-        props.children === undefined ? 'outline-secondary' : 'outline-primary'
+        props.children === undefined
+          ? props.tran.tag === '변동지출'
+            ? 'danger'
+            : 'outline-secondary'
+          : 'outline-primary'
       }
       size='sm'
       children={props.children === undefined ? '추가' : '영수증'}
