@@ -11,6 +11,7 @@ import { FirebaseDatabaseProvider } from '@react-firebase/database';
 import FileUploader from './components/FileUploader';
 import DataViewer from './components/DataViewer';
 import TagManager from './components/TagManager';
+import MonthStatistics from './components/MonthStatistics';
 import { Button } from 'react-bootstrap';
 import { BsCloudUpload } from 'react-icons/bs';
 
@@ -49,7 +50,7 @@ const Navigator = ({ state, setState }) => {
       className='bg-dark w-100 p-2 d-flex align-items-center'
       style={{ height: '3rem' }}
     >
-      {['DataViewer', 'TagManager'].map((text, pk) => (
+      {['DataViewer', 'TagManager', 'MonthStatistics'].map((text, pk) => (
         <Button
           active
           key={pk}
@@ -103,7 +104,7 @@ class App extends Component {
       providerId: null,
     },
     showFileUploader: false,
-    page: 'DataViewer',
+    page: 'MonthStatistics',
   };
 
   render() {
@@ -142,6 +143,7 @@ class App extends Component {
                     {
                       DataViewer: <DataViewer />,
                       TagManager: <TagManager />,
+                      MonthStatistics: <MonthStatistics />,
                     }[this.state.page]
                   }
                 />

@@ -64,15 +64,11 @@ const format_curr = (num) => {
 const format_timestamp = (old_timestamp) => {
   const time = moment(old_timestamp, 'YYYY-MM-DDHH:mm:ss');
   if (!time.isValid()) return 'Not Valid';
-  return time
-    .format('MM[/]DD[(]ddd[)] HH[:]mm[:]ss')
-    .replace('Sun', '일')
-    .replace('Mon', '월')
-    .replace('Tue', '화')
-    .replace('Wed', '수')
-    .replace('Thu', '목')
-    .replace('Fri', '금')
-    .replace('Sat', '토');
+  return time.format('MM[/]DD[(]ddd[)] HH[:]mm[:]ss');
 };
+
+moment.updateLocale('kr', {
+  weekdaysShort: ['일', '월', '화', '수', '목', '금', '토'],
+});
 
 export { Cell, number_format, format_curr, format_timestamp };
