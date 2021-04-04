@@ -95,3 +95,4 @@ scrap/.env
 scrap/.idea
 scrap/geckodriver.exe
 scrap/result.json
+scrap/firebase_config.json
