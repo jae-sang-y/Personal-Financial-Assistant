@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import sys
 from collections import defaultdict
 from time import sleep
 from typing import Dict, List, Optional, Tuple
@@ -187,4 +188,4 @@ class Uploader:
         self.update_trans(old_trans, new_trans)
 
 
-Uploader().run()
+Uploader(need_scrap='/s' in sys.argv).run()
