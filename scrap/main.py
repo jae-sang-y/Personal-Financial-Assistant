@@ -163,7 +163,8 @@ class Uploader:
             for timestamp, tran in new_trans[target_yyyy_mm].items():
                 if target_yyyy_mm not in union_transactions:
                     union_transactions[target_yyyy_mm] = {}
-                union_transactions[target_yyyy_mm][timestamp] = tran
+                if timestamp not in union_transactions[target_yyyy_mm]:
+                    union_transactions[target_yyyy_mm][timestamp] = tran
 
         firebase_update_list_for_month_of_transactions = {
             target_yyyy_mm: len(tran_list) for target_yyyy_mm, tran_list in union_transactions.items()
