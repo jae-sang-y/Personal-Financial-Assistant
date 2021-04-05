@@ -1,14 +1,11 @@
 import { Component } from 'react';
 import { FirebaseDatabaseNode } from '@react-firebase/database';
 import { Button, ButtonGroup } from 'react-bootstrap';
-import {
-  number_format,
-  format_curr,
-  format_timestamp,
-} from './DataViewer.style';
+import { number_format, format_curr } from './DataViewer.style';
 
 import firebase from 'firebase/app';
 import moment from 'moment';
+import MonthChart from './MonthChart';
 
 const getPayday = (targetYM) => {
   const payday = moment({
@@ -56,10 +53,11 @@ class MonthStatistics extends Component {
   state = {
     targetYM: moment().format('YYYY-MM'),
     current: {},
+    showTable: false,
   };
 
   componentDidMount() {
-    this.updateTargetYYMM();
+    this.updateTargetYYMM(this.state.targetYM);
   }
 
   updateCurrent(key, value) {
@@ -68,32 +66,42 @@ class MonthStatistics extends Component {
     this.setState({ current: new_current });
   }
 
-  async updateTargetYYMM() {
+  async updateTargetYYMM(targetYM) {
     const current = {};
-    current.prevMonth = getPrevMonth(this.state.targetYM);
-    current.paySpan = getPayspan(this.state.targetYM);
+    current.targetMonth = targetYM;
+    current.prevMonth = getPrevMonth(targetYM);
+    current.paySpan = getPayspan(targetYM);
 
     const days = [];
     const day_stats = {};
     const time_stepper = moment(current.paySpan.begin);
+    let k = 0;
     while (time_stepper < current.paySpan.end) {
       days.push(moment(time_stepper));
       const mm_dd = time_stepper.format('MM-DD');
       day_stats[mm_dd] = {
+        dayFromPayday: k,
+        endBalance: null,
+        row_span: 1,
+        totalLoss: 0,
         transactions: [],
+        moneyPerDay: 0,
+        deltaMoneyPerDay: 0,
+        moment: moment(time_stepper),
       };
+      k += 1;
       time_stepper.add(1, 'day');
     }
 
     const this_month_ret = await firebase
       .app()
       .database()
-      .ref(`transactions/${this.state.targetYM}`)
+      .ref(`transactions/${targetYM}`)
       .get();
     const prev_month_ret = await firebase
       .app()
       .database()
-      .ref(`transactions/${getPrevMonth(this.state.targetYM)}`)
+      .ref(`transactions/${getPrevMonth(targetYM)}`)
       .get();
     const transactions = Object.assign(
       {},
@@ -105,21 +113,39 @@ class MonthStatistics extends Component {
       if (
         moment(timestamp) >= current.paySpan.begin &&
         moment(timestamp) <= current.paySpan.end
-      )
-        day_stats[timestamp.substr(5, 5)].transactions.push(
-          transactions[timestamp]
-        );
+      ) {
+        const mm_dd = timestamp.substr(5, 5);
+        const tran = transactions[timestamp];
+        const dayStat = day_stats[mm_dd];
+        if (tran.delta < 0) dayStat.totalLoss += Number(tran.delta);
+        dayStat.endBalance = tran.balance;
+        dayStat.transactions.push(tran);
+        day_stats[mm_dd] = dayStat;
+      }
+    }
+
+    let last_balance = -1;
+    let lastMoneyPerDay = null;
+    if (transactions.length > 0)
+      last_balance = transactions[0].balance - transactions[0].delta;
+    for (const mm_dd in day_stats) {
+      const dayStat = day_stats[mm_dd];
+      dayStat.rowSpan = Math.max(1, dayStat.transactions.length);
+      dayStat.dayFromPayday = k - dayStat.dayFromPayday;
+      if (dayStat.endBalance === null) dayStat.endBalance = last_balance;
+      else last_balance = dayStat.endBalance;
+      dayStat.moneyPerDay = Math.floor(
+        dayStat.endBalance / dayStat.dayFromPayday
+      );
+      if (lastMoneyPerDay === null) lastMoneyPerDay = dayStat.moneyPerDay;
+      dayStat.deltaMoneyPerDay = dayStat.moneyPerDay - lastMoneyPerDay;
+      lastMoneyPerDay = dayStat.moneyPerDay;
+      dayStat[mm_dd] = dayStat;
     }
 
     current.days = days;
     current.dayStats = day_stats;
-    this.setState({ current: current });
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.targetYM !== this.state.targetYM) {
-      this.updateTargetYYMM();
-    }
+    this.setState({ current: current, targetYM: targetYM });
   }
 
   render() {
@@ -138,37 +164,58 @@ class MonthStatistics extends Component {
                     size='sm'
                     variant='outline-dark'
                     children={ym}
-                    onClick={() => this.setState({ targetYM: ym })}
+                    onClick={() => this.updateTargetYYMM(ym)}
                   />
                 ))}
             </ButtonGroup>
           )}
         />
         <p children={getPayday(this.state.targetYM).format('YYYY-MM-DD')} />
-        <div className='d-flex container'>
-          {current.days && current.dayStats && (
+        <div className='d-flex container flex-column'>
+          <Button
+            size='sm'
+            children='테이블'
+            variant='outline-primary'
+            onClick={() => this.setState({ showTable: !this.state.showTable })}
+          />
+          {current.days && current.dayStats && this.state.showTable && (
             <table>
               <thead>
-                {['일자', '시간', '노트', '잔액', '변동'].map((text) => (
+                {[
+                  '일자',
+                  '총 소비',
+                  '말잔',
+                  '가사용금',
+                  '가사용금 변화',
+                  '시간',
+                  '노트',
+                  '잔액',
+                  '변동',
+                ].map((text) => (
                   <th children={text} className='border' />
                 ))}
               </thead>
               <tbody>
                 {current.days.map((day) => {
-                  const trans =
-                    current.dayStats[day.format('MM-DD')].transactions;
+                  const dayStat = current.dayStats[day.format('MM-DD')];
+                  const trans = dayStat.transactions;
+
                   return (
                     <>
                       <tr>
-                        <td
-                          children={day.format('MM[/]DD[(]ddd[)]')}
-                          className='border'
-                          rowSpan={Math.max(
-                            1,
-                            current.dayStats[day.format('MM-DD')].transactions
-                              .length
-                          )}
-                        />
+                        {[
+                          day.format('MM[/]DD[(]ddd[)]'),
+                          number_format.format(dayStat.totalLoss),
+                          number_format.format(dayStat.endBalance),
+                          number_format.format(dayStat.moneyPerDay),
+                          format_curr(dayStat.deltaMoneyPerDay),
+                        ].map((text) => (
+                          <td
+                            children={text}
+                            className='border text-right'
+                            rowSpan={dayStat.rowSpan}
+                          />
+                        ))}
                         {trans.length > 0 ? (
                           tranAsRow(trans[0])
                         ) : (
@@ -189,6 +236,9 @@ class MonthStatistics extends Component {
                 })}
               </tbody>
             </table>
+          )}
+          {current.days && current.dayStats && !this.state.showTable && (
+            <MonthChart current={current} />
           )}
         </div>
       </div>

@@ -43,6 +43,9 @@ const Cell = {
   `,
 };
 
+const delta_number_format = new Intl.NumberFormat('ko-KR', {
+  style: 'decimal',
+});
 const number_format = new Intl.NumberFormat('ko-KR', {
   signDisplay: 'never',
   style: 'decimal',
@@ -71,4 +74,18 @@ moment.updateLocale('kr', {
   weekdaysShort: ['일', '월', '화', '수', '목', '금', '토'],
 });
 
-export { Cell, number_format, format_curr, format_timestamp };
+const formatKorean = (number) => {
+  const sign = number < 0 ? '-' : '';
+  let absNumber = Math.abs(number);
+  let result = sign;
+  if (absNumber === 0) return '0원';
+  if (absNumber >= 1_0000) {
+    const k = Math.floor(absNumber / 1_0000);
+    result += k + '만';
+    absNumber -= k * 1_0000;
+  }
+  if (absNumber > 0) result += absNumber;
+  return result + '원';
+};
+
+export { Cell, number_format, format_curr, format_timestamp, formatKorean };
