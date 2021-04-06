@@ -118,7 +118,7 @@ class MonthStatistics extends Component {
         const tran = transactions[timestamp];
         const dayStat = day_stats[mm_dd];
         if (tran.delta < 0) dayStat.totalLoss += Number(tran.delta);
-        dayStat.endBalance = tran.balance;
+        dayStat.endBalance = Number(tran.balance);
         dayStat.transactions.push(tran);
         day_stats[mm_dd] = dayStat;
       }
