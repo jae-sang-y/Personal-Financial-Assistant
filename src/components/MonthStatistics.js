@@ -171,7 +171,7 @@ class MonthStatistics extends Component {
           )}
         />
         <p children={getPayday(this.state.targetYM).format('YYYY-MM-DD')} />
-        <div className='d-flex container flex-column'>
+        <div className='d-flex container-xl flex-column'>
           <Button
             size='sm'
             children='테이블'

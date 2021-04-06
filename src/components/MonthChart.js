@@ -129,12 +129,25 @@ class MonthChart extends Component {
                 tension: 0, // disables bezier curves
               },
             },
+            legend: {
+              labels: {
+                fontSize:
+                  Math.min(window.innerWidth, window.innerHeight) * 0.015,
+              },
+            },
             scales: {
               xAxes: [
                 {
                   id: 'x-axis-1',
                   position: 'bottom',
-                  ticks: { maxTicksLimit: 32 },
+                  ticks: {
+                    maxTicksLimit: 32,
+                    fontSize:
+                      Math.min(window.innerWidth, window.innerHeight) * 0.015,
+                  },
+                  scaleLabel: {
+                    display: false,
+                  },
                 },
                 {
                   id: 'x-axis-2',
@@ -170,6 +183,8 @@ class MonthChart extends Component {
                     stepSize: 50_0000,
                     autoSkip: false,
                     callback: (value) => formatKorean(value),
+                    fontSize:
+                      Math.min(window.innerWidth, window.innerHeight) * 0.015,
                   },
                   grid: { display: false },
                 },
@@ -180,6 +195,8 @@ class MonthChart extends Component {
                   ticks: {
                     autoSkip: false,
                     callback: (value) => formatKorean(value),
+                    fontSize:
+                      Math.min(window.innerWidth, window.innerHeight) * 0.015,
                   },
                   id: 'y-axis-2',
                 },
