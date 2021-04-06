@@ -12,28 +12,72 @@ class MonthChart extends Component {
   getData(canvas) {
     const current = this.props.current;
 
-    return {
+    const balance_dataset = {
+      order: 100,
+      label: 'Balance',
+      borderWidth: 2,
+      pointRadius: 0,
+      pointHitRadius: 15,
+      xAxisID: 'x-axis-1',
+      yAxisID: 'y-axis-1',
+      borderColor: '#7787e3D0',
+      backgroundColor: '#7787e3D0',
+      fill: false,
+      data: [],
+    };
+
+    const expected_balance_dataset = {
+      order: 110,
+      label: 'Balance(exp)',
+      borderWidth: 2,
+      pointRadius: 0,
+      pointHitRadius: 15,
+      xAxisID: 'x-axis-1',
+      yAxisID: 'y-axis-1',
+      borderColor: '#a7a7e3D0',
+      backgroundColor: '#6777e3D0',
+      borderDash: [5, 5],
+      fill: false,
+      data: [],
+    };
+
+    let last_end_balance = null;
+    let loss_dataset = [];
+    let avg_loss_without_bigger_value = null;
+
+    Object.values(current.dayStats).forEach((dayStat, k) => {
+      if (dayStat.moment < moment()) {
+        balance_dataset.data.push(dayStat.endBalance);
+        if (last_end_balance === null) last_end_balance = dayStat.endBalance;
+        loss_dataset.push(dayStat.totalLoss);
+        last_end_balance = dayStat.endBalance;
+        expected_balance_dataset.data.push(NaN);
+      }
+      if (dayStat.moment > moment()) {
+        if (avg_loss_without_bigger_value === null) {
+          loss_dataset = loss_dataset.sort((a, b) => a - b);
+          let remove_count = Math.floor(k / 4);
+          loss_dataset = loss_dataset.splice(remove_count);
+          console.log(loss_dataset);
+          avg_loss_without_bigger_value = Math.round(
+            loss_dataset.reduce((a, b) => a + b) / loss_dataset.length
+          );
+          console.log(avg_loss_without_bigger_value);
+        }
+        expected_balance_dataset.data.push(last_end_balance);
+        last_end_balance += avg_loss_without_bigger_value;
+      }
+    });
+    expected_balance_dataset.data.push(last_end_balance);
+    expected_balance_dataset.data = expected_balance_dataset.data.slice(1);
+    const result = {
       labels: current.days.map((moment, idx) =>
         moment.format(
           moment.date() === 1 || idx === 0 ? `MM월 DD(ddd)` : `DD(ddd)`
         )
       ),
       datasets: [
-        {
-          order: 100,
-          label: 'Balance',
-          borderWidth: 2,
-          pointRadius: 0,
-          pointHitRadius: 15,
-          xAxisID: 'x-axis-1',
-          yAxisID: 'y-axis-1',
-          borderColor: '#7787e3D0',
-          backgroundColor: '#7787e3D0',
-          fill: false,
-          data: Object.values(current.dayStats)
-            .filter((dayStat) => dayStat.moment < moment())
-            .map((dayStat) => dayStat.endBalance),
-        },
+        balance_dataset,
         {
           type: 'bar',
           order: 200,
@@ -67,6 +111,11 @@ class MonthChart extends Component {
         },
       ],
     };
+
+    if (avg_loss_without_bigger_value !== null)
+      result.datasets.push(expected_balance_dataset);
+
+    return result;
   }
 
   render() {
@@ -84,8 +133,29 @@ class MonthChart extends Component {
               xAxes: [
                 {
                   id: 'x-axis-1',
-                  ticks: { autoSkip: false },
-                  grid: { display: false },
+                  position: 'bottom',
+                  ticks: { maxTicksLimit: 32 },
+                },
+                {
+                  id: 'x-axis-2',
+                  position: 'bottom',
+                  ticks: {
+                    maxTicksLimit: 5,
+                    fontSize: 0,
+                  },
+                  gridLines: {
+                    color: '#808080',
+                    drawTicks: false,
+                    drawBorder: false,
+                    zeroLineColor: 'rgba(0,0,0,0)',
+                    lineWidth: 1.2,
+                  },
+                  scaleLabel: {
+                    display: true,
+                  },
+                  offset: false,
+                  //grid: { display: false },
+                  //gridLines: { drawBorder: false },
                 },
               ],
 
@@ -111,7 +181,6 @@ class MonthChart extends Component {
                     autoSkip: false,
                     callback: (value) => formatKorean(value),
                   },
-
                   id: 'y-axis-2',
                 },
               ],
