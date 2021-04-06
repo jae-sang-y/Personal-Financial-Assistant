@@ -1,1 +1,1 @@
-.venv\Scripts\python.exe main.py /s
+.venv\Scripts\python.exe main.py /s /d
