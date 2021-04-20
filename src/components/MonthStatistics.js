@@ -11,7 +11,7 @@ const getPayday = (targetYM) => {
   const payday = moment({
     year: targetYM.substr(0, 4),
     month: targetYM.substr(5, 2) - 1,
-    day: '20',
+    day: '21',
   });
   while (payday.weekday() === 0 || payday.weekday() === 6) {
     payday.subtract(1, 'day');
@@ -147,7 +147,13 @@ class MonthStatistics extends Component {
     current.dayStats = day_stats;
     this.setState({ current: current, targetYM: targetYM });
   }
-
+  appendFutureMonth(months) {
+    if (moment().date() > 20) {
+      const next_month_key = moment().add({ month: 1 }).format('YY-MM');
+      if (!(next_month_key in months)) months[next_month_key] = 0;
+    }
+    return months;
+  }
   render() {
     const current = this.state.current;
     return (
@@ -158,7 +164,7 @@ class MonthStatistics extends Component {
             <ButtonGroup toggle className='my-3'>
               <Button size='sm' children='조회연월' variant='outline-dark' />
               {d.value &&
-                Object.entries(d.value).map(([ym]) => (
+                Object.entries(this.appendFutureMonth(d.value)).map(([ym]) => (
                   <Button
                     key={ym}
                     size='sm'
