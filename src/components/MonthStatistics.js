@@ -6,6 +6,7 @@ import { number_format, format_curr } from './DataViewer.style';
 import firebase from 'firebase/app';
 import moment from 'moment';
 import MonthChart from './MonthChart';
+import MonthCalendar from './MonthCalendar';
 
 const getPayday = (targetYM) => {
   const payday = moment({
@@ -53,7 +54,7 @@ class MonthStatistics extends Component {
   state = {
     targetYM: moment().format('YYYY-MM'),
     current: {},
-    showTable: false,
+    showMode: 'calendar',
   };
 
   componentDidMount() {
@@ -178,14 +179,28 @@ class MonthStatistics extends Component {
         />
         <p children={getPayday(this.state.targetYM).format('YYYY-MM-DD')} />
         <div className='d-flex container-xl flex-column'>
-          <Button
-            size='sm'
-            children='테이블'
-            variant='outline-primary'
-            onClick={() => this.setState({ showTable: !this.state.showTable })}
-          />
-          {current.days && current.dayStats && this.state.showTable && (
-            <table>
+          <ButtonGroup className='mx-auto'>
+            <Button
+              size='sm'
+              children='테이블'
+              variant='outline-primary'
+              onClick={() => this.setState({ showMode: 'table' })}
+            />
+            <Button
+              size='sm'
+              children='차트'
+              variant='outline-primary'
+              onClick={() => this.setState({ showMode: 'chart' })}
+            />
+            <Button
+              size='sm'
+              children='캘린더'
+              variant='outline-primary'
+              onClick={() => this.setState({ showMode: 'calendar' })}
+            />
+          </ButtonGroup>
+          {current.days && current.dayStats && this.state.showMode === 'table' && (
+            <table className='mx-auto'>
               <thead>
                 {[
                   '일자',
@@ -243,9 +258,14 @@ class MonthStatistics extends Component {
               </tbody>
             </table>
           )}
-          {current.days && current.dayStats && !this.state.showTable && (
-            <MonthChart current={current} />
-          )}
+          {current.days &&
+            current.dayStats &&
+            this.state.showMode === 'chart' && <MonthChart current={current} />}
+          {current.days &&
+            current.dayStats &&
+            this.state.showMode === 'calendar' && (
+              <MonthCalendar current={current} />
+            )}
         </div>
       </div>
     );
