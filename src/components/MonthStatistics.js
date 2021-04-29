@@ -52,9 +52,12 @@ const tranAsRow = (tran) => {
 
 class MonthStatistics extends Component {
   state = {
-    targetYM: moment().format('YYYY-MM'),
+    targetYM:
+      moment().date() >= 21
+        ? moment().add({ month: 1 }).format('YYYY-MM')
+        : moment().format('YYYY-MM'),
     current: {},
-    showMode: 'calendar',
+    showMode: 'chart',
   };
 
   componentDidMount() {
@@ -150,7 +153,7 @@ class MonthStatistics extends Component {
   }
   appendFutureMonth(months) {
     if (moment().date() > 20) {
-      const next_month_key = moment().add({ month: 1 }).format('YY-MM');
+      const next_month_key = moment().add({ month: 1 }).format('YYYY-MM');
       if (!(next_month_key in months)) months[next_month_key] = 0;
     }
     return months;
