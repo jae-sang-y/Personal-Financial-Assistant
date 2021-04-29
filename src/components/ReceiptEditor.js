@@ -190,7 +190,9 @@ class ReceiptEditor extends Component {
                       children={number_format.format(sum)}
                       className={
                         'border text-center' +
-                        (sum + receipt.tran.delta === 0 ? '' : ' text-danger')
+                        (Math.round(sum + receipt.tran.delta) === 0
+                          ? ''
+                          : ' text-danger')
                       }
                     />
                   </tr>
@@ -206,7 +208,7 @@ class ReceiptEditor extends Component {
               <Button
                 variant='primary'
                 disabled={
-                  sum + Number(receipt.tran.delta) !== 0 &&
+                  Math.round(sum + Number(receipt.tran.delta)) !== 0 &&
                   receipt.content.length > 0
                 }
                 onClick={() => {
