@@ -60,7 +60,8 @@ class MonthCalendar extends Component {
     selectedDayStat: null,
   };
   render() {
-    const start_index = this.props.current.days[0].weekday();
+    if (this.props.current.days.length === 0) return 'No available days';
+    const start_index = (7 - 1 + this.props.current.days[0].weekday()) % 7;
     return (
       <div className='mx-auto'>
         <div className='mt-3'>
@@ -80,7 +81,6 @@ class MonthCalendar extends Component {
             </div>
           ))}
         </div>
-        {console.log(this.state.selectedDayStat)}
         {this.state.selectedDayStat && (
           <table className='mx-auto mt-2'>
             <thead>
