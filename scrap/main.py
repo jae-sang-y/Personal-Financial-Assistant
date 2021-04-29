@@ -1,4 +1,5 @@
 import json
+import traceback
 import os
 import re
 import sys
@@ -6,15 +7,19 @@ from collections import defaultdict
 from time import sleep
 from typing import Dict, List, Optional, Tuple
 
+logger = sys.stdout
+if '/d' in sys.argv:
+    logger = open('log.log', 'w')
+    sleep(300)
+
 from dotenv import load_dotenv
 from firebase import Firebase
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
-if '/d' in sys.argv:
-    sleep(60)
 load_dotenv()
+
 
 
 class Uploader:
@@ -65,7 +70,7 @@ class Uploader:
             lambda: sleep(1),
         ]
         for k, command in enumerate(commands):
-            print('{:03d}'.format(k), command.__code__.co_consts[1:])
+            print('{:03d}'.format(k), command.__code__.co_consts[1:], file=logger)
             command()
         with open('result.json', 'w', encoding='utf-8') as out:
             try:
@@ -78,8 +83,8 @@ class Uploader:
                     except NoSuchElementException:
                         result['timestamp'] = item.find_element_by_css_selector('p[class~="TDT_EFN_TRNS_DVCD"]>button>em').text
                     result['protocol'] = item.find_element_by_css_selector('p[class~="TDT_EFN_TRNS_DVCD"]>span').text
-                    result['balance'] = item.find_element_by_css_selector('li[class="AFTRN_LDG_BALAMT"]>span>em').text
-                    result['delta'] = item.find_element_by_css_selector('span[class~="TRNS_AMT"]').text
+                    result['balance'] = float(item.find_element_by_css_selector('li[class="AFTRN_LDG_BALAMT"]>span>em').text)
+                    result['delta'] = float(item.find_element_by_css_selector('span[class~="TRNS_AMT"]').text)
                     result['note'] = item.find_element_by_css_selector('p[class="tit CLNT_NM"]').text
                     if k > 0:
                         print(',', file=out)
@@ -190,5 +195,7 @@ class Uploader:
         old_trans = self.get_old_trans(target_dates=list(new_trans.keys()))
         self.update_trans(old_trans, new_trans)
 
-
-Uploader(need_scrap='/s' in sys.argv).run()
+try:
+    Uploader(need_scrap='/s' in sys.argv).run()
+except:
+    traceback.print_exc(file=logger)
