@@ -58,11 +58,9 @@ class MonthChart extends Component {
           loss_dataset = loss_dataset.sort((a, b) => a - b);
           let remove_count = Math.floor(k / 4);
           loss_dataset = loss_dataset.splice(remove_count);
-          console.log(loss_dataset);
           avg_loss_without_bigger_value = Math.round(
             loss_dataset.reduce((a, b) => a + b) / loss_dataset.length
           );
-          console.log(avg_loss_without_bigger_value);
         }
         expected_balance_dataset.data.push(last_end_balance);
         last_end_balance += avg_loss_without_bigger_value;
