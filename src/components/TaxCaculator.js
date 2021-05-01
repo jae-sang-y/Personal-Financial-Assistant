@@ -1,7 +1,6 @@
 import { Component } from 'react';
 
 import firebase from 'firebase/app';
-import { FirebaseDatabaseNode } from '@react-firebase/database';
 import { formatKorean, format_curr } from './DataViewer.style';
 
 class TaxCaculator extends Component {
@@ -57,10 +56,13 @@ class TaxCaculator extends Component {
         (e) => e[0].substr(2, 2) === this.state.target_yy
       );
       const incomes = trans.map(([YYYY_MM, trans]) => {
-        const income_amt = Object.values(trans)
+        const incomes_in_month = Object.values(trans)
           .filter((tran) => tran.tag === '급여')
-          .map((tran) => tran.delta)
-          .reduce((a, b) => a + b);
+          .map((tran) => tran.delta);
+        const income_amt =
+          incomes_in_month.length > 0
+            ? incomes_in_month.reduce((a, b) => a + b)
+            : 0;
         return [YYYY_MM, income_amt];
       });
 
@@ -79,10 +81,11 @@ class TaxCaculator extends Component {
       } else income_sum_amt_exp = income_sum_amt_real;
 
       const card_loss = trans.map(([YYYY_MM, trans]) => {
-        const loss_amt = Object.values(trans)
+        const loss_in_month = Object.values(trans)
           .filter((tran) => tran.type === 'BC')
-          .map((tran) => tran.delta)
-          .reduce((a, b) => a + b);
+          .map((tran) => tran.delta);
+        const loss_amt =
+          loss_in_month.length > 0 ? loss_in_month.reduce((a, b) => a + b) : 0;
         return [YYYY_MM, loss_amt];
       });
       let card_loss_sum_amt_exp = NaN;
@@ -100,13 +103,13 @@ class TaxCaculator extends Component {
       } else card_loss_sum_amt_exp = card_loss_sum_amt_real;
 
       const transport_loss = trans.map(([YYYY_MM, trans]) => {
-        const loss_amt = Object.values(trans)
+        const loss_in_month = Object.values(trans)
           .filter((tran) => tran.tag === '교통비')
-          .map((tran) => tran.delta)
-          .reduce((a, b) => a + b);
+          .map((tran) => tran.delta);
+        const loss_amt =
+          loss_in_month.length > 0 ? loss_in_month.reduce((a, b) => a + b) : 0;
         return [YYYY_MM, loss_amt];
       });
-      console.log(transport_loss);
       let transport_loss_sum_amt_exp = NaN;
       let transport_loss_sum_amt_real = 0;
       transport_loss.forEach(
@@ -363,7 +366,7 @@ class TaxCaculator extends Component {
           '(J)원천징수세액': -Math.round(this.state.pre_tax_sum_amt_exp),
           '(K)지잔납부세액[H -I,J]': Math.round(this.getFinalDeduction()),
         }).map(([tag, amt]) => (
-          <tr>
+          <tr key={tag}>
             <th children={tag} className='border' />
             <td children={formatKorean(amt)} className='border text-right' />
           </tr>
