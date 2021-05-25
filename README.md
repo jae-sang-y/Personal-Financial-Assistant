@@ -6,3 +6,4 @@ Made with React.js
 ![alt](3.png)
 ![alt](4.png)
 ![alt](5.png)
+![alt](6.png)
