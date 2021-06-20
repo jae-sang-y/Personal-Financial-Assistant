@@ -55,16 +55,18 @@ class TaxCaculator extends Component {
       const trans = Object.entries(d.val()).filter(
         (e) => e[0].substr(2, 2) === this.state.target_yy
       );
-      const incomes = trans.map(([YYYY_MM, trans]) => {
-        const incomes_in_month = Object.values(trans)
-          .filter((tran) => tran.tag === '급여')
-          .map((tran) => tran.delta);
-        const income_amt =
-          incomes_in_month.length > 0
-            ? incomes_in_month.reduce((a, b) => a + b)
-            : 0;
-        return [YYYY_MM, income_amt];
-      });
+      const incomes = trans
+        .map(([YYYY_MM, trans]) => {
+          const incomes_in_month = Object.values(trans)
+            .filter((tran) => tran.tag === '급여')
+            .map((tran) => tran.delta);
+          const income_amt =
+            incomes_in_month.length > 0
+              ? incomes_in_month.reduce((a, b) => a + b)
+              : 0;
+          return [YYYY_MM, income_amt];
+        })
+        .filter(([YYYY_MM, income_amt]) => income_amt > 0);
 
       let income_sum_amt_exp = NaN;
       let income_sum_amt_real = 0;
