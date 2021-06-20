@@ -40,9 +40,6 @@ const Cell = {
   `,
 };
 
-const delta_number_format = new Intl.NumberFormat('ko-KR', {
-  style: 'decimal',
-});
 const number_format = new Intl.NumberFormat('ko-KR', {
   signDisplay: 'never',
   style: 'decimal',
