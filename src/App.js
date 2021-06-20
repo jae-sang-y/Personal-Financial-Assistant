@@ -13,6 +13,8 @@ import DataViewer from './components/DataViewer';
 import TagManager from './components/TagManager';
 import MonthStatistics from './components/MonthStatistics';
 import TaxCaculator from './components/TaxCaculator';
+import DataAnalyzer from './components/DataAnalyzer';
+
 import { Button } from 'react-bootstrap';
 import { BsCloudUpload } from 'react-icons/bs';
 
@@ -51,21 +53,25 @@ const Navigator = ({ state, setState }) => {
       className='bg-dark w-100 p-2 d-flex align-items-center'
       style={{ height: '3rem' }}
     >
-      {['DataViewer', 'TagManager', 'MonthStatistics', 'TaxCaculator'].map(
-        (text, pk) => (
-          <Button
-            active
-            key={pk}
-            className={
-              'h-100 py-0 px-1 bg-transparent border-0 ' +
-              (text === state.page ? 'font-weight-bold' : '')
-            }
-            style={{ boxShadow: 'none' }}
-            children={text === state.page ? <u children={text} /> : text}
-            onClick={() => setState({ page: text })}
-          />
-        )
-      )}
+      {[
+        'DataViewer',
+        'TagManager',
+        'MonthStatistics',
+        'TaxCaculator',
+        'DataAnalyzer',
+      ].map((text, pk) => (
+        <Button
+          active
+          key={pk}
+          className={
+            'h-100 py-0 px-1 bg-transparent border-0 ' +
+            (text === state.page ? 'font-weight-bold' : '')
+          }
+          style={{ boxShadow: 'none' }}
+          children={text === state.page ? <u children={text} /> : text}
+          onClick={() => setState({ page: text })}
+        />
+      ))}
 
       <BsCloudUpload
         as='button'
@@ -107,7 +113,7 @@ class App extends Component {
       providerId: null,
     },
     showFileUploader: false,
-    page: 'MonthStatistics',
+    page: 'DataAnalyzer',
   };
 
   render() {
@@ -148,6 +154,7 @@ class App extends Component {
                       TagManager: <TagManager />,
                       MonthStatistics: <MonthStatistics />,
                       TaxCaculator: <TaxCaculator />,
+                      DataAnalyzer: <DataAnalyzer />,
                     }[this.state.page]
                   }
                 />
