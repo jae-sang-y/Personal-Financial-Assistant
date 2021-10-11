@@ -40,24 +40,29 @@ try:
                 self.scrap()
 
         def scrap(self):
-            driver = webdriver.Firefox(firefox_binary=r'E:\Program Files (x86)\Mozilla Firefox\firefox.exe')
-            driver.set_window_position(-10000, 0)
+            driver = webdriver.Firefox(firefox_binary=r'C:\Program Files\Mozilla Firefox\firefox.exe')
+            # driver.set_window_position(-10000, 0)
             driver.get("https://mbanking.dgb.co.kr/com_ebz_mbs_00001.act/")
 
             commands = [
                 lambda: driver.execute_script('document.getElementById("_DGB_MBS_HEADER_LOGIN").click();'),
                 lambda: sleep(1),
                 lambda: driver.execute_script('document.getElementById("idTab").click();'),
-                lambda: driver.execute_script('document.getElementById("user_id").value = "{}";'.format(os.environ['DGB_ID'])),
+                lambda: driver.execute_script(
+                    'document.getElementById("user_id").value = "{}";'.format(os.environ['DGB_ID'])),
                 lambda: driver.execute_script('$("#pass").focusin()'),
                 lambda: sleep(1),
-                lambda: [driver.find_element_by_css_selector(f'div>div>p>img[alt="{key}"]').find_element_by_xpath('../../..').click() for key in os.environ['DGB_PWD']],
+                lambda: [driver.find_element_by_css_selector(f'div>div>p>img[alt="{key}"]').find_element_by_xpath(
+                    '../../..').click() for key in os.environ['DGB_PWD']],
                 lambda: driver.execute_script('document.getElementById("exeLogIn").click();'),
                 lambda: sleep(1),
                 lambda: driver.execute_script('$("#pswd").focusin()'),
                 lambda: sleep(1),
-                lambda: [driver.find_element_by_css_selector(f'#mtk_pswd>div>div>div>p>img[alt="{key}"]').find_element_by_xpath('../../..').click() for key in os.environ['ACCOUNT_PWD']],
-                lambda: driver.execute_script('document.getElementById("birth").value="{}";'.format(os.environ['BIRTH_DATE'])),
+                lambda: [driver.find_element_by_css_selector(
+                    f'#mtk_pswd>div>div>div>p>img[alt="{key}"]').find_element_by_xpath('../../..').click() for key in
+                         os.environ['ACCOUNT_PWD']],
+                lambda: driver.execute_script(
+                    'document.getElementById("birth").value="{}";'.format(os.environ['BIRTH_DATE'])),
                 lambda: driver.execute_script('document.getElementById("btn_confirm").click();'),
                 lambda: sleep(1),
                 lambda: driver.execute_script('document.getElementById("_DGB_ALERT_BTN").click()'),
@@ -69,6 +74,10 @@ try:
                 lambda: sleep(1),
                 lambda: driver.execute_script('document.querySelector(".bottom>.btn-close").click()'),
                 lambda: sleep(1),
+                lambda: driver.execute_script('document.querySelector("#condition_button").click()'),
+                lambda: driver.execute_script('document.querySelector("#cal_btn4").click()'),
+                lambda: driver.execute_script('document.querySelector("#trnsSearch").click()'),
+                lambda: sleep(3),
             ]
             for k, command in enumerate(commands):
                 print('{:03d}'.format(k), command.__code__.co_consts[1:], file=logger)
@@ -80,11 +89,15 @@ try:
                         # print(driver.execute_script("return arguments[0].innerHTML;", item), file=open(f'{k}.raw', 'w'))
                         result = {}
                         try:
-                            result['timestamp'] = item.find_element_by_css_selector('p[class~="TDT_EFN_TRNS_DVCD"]>em').text
+                            result['timestamp'] = item.find_element_by_css_selector(
+                                'p[class~="TDT_EFN_TRNS_DVCD"]>em').text
                         except NoSuchElementException:
-                            result['timestamp'] = item.find_element_by_css_selector('p[class~="TDT_EFN_TRNS_DVCD"]>button>em').text
-                        result['protocol'] = item.find_element_by_css_selector('p[class~="TDT_EFN_TRNS_DVCD"]>span').text
-                        result['balance'] = item.find_element_by_css_selector('li[class="AFTRN_LDG_BALAMT"]>span>em').text
+                            result['timestamp'] = item.find_element_by_css_selector(
+                                'p[class~="TDT_EFN_TRNS_DVCD"]>button>em').text
+                        result['protocol'] = item.find_element_by_css_selector(
+                            'p[class~="TDT_EFN_TRNS_DVCD"]>span').text
+                        result['balance'] = item.find_element_by_css_selector(
+                            'li[class="AFTRN_LDG_BALAMT"]>span>em').text
                         result['delta'] = item.find_element_by_css_selector('span[class~="TRNS_AMT"]').text
                         result['note'] = item.find_element_by_css_selector('p[class="tit CLNT_NM"]').text
                         if k > 0:
@@ -98,7 +111,7 @@ try:
                         print('\t}', end='', file=out)
                     print('\n]', file=out)
                 finally:
-                    driver.close()
+                    pass # driver.close()
 
         @property
         def tags(self):
@@ -197,7 +210,7 @@ try:
             self.update_trans(old_trans, new_trans)
 
 
-    Uploader(need_scrap='/s' in sys.argv).run()
+    Uploader(need_scrap=True).run()
 except:
     print('EXCEPT', datetime.now(), file=logger)
     traceback.print_exc()
