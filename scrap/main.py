@@ -8,9 +8,11 @@ load_dotenv()
 try:
     log('START')
     if is_activated(RunFlags.Scrap):
+        log('SCRAP')
         scrap()
 
     if is_activated(RunFlags.Upload):
+        log('UPLOAD')
         Uploader().run()
 except Exception as e:
     log('EXCEPT')

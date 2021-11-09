@@ -16,6 +16,7 @@ def scrap():
     driver.get("https://mbanking.dgb.co.kr/com_ebz_mbs_00001.act/")
     commands = [
         lambda: driver.execute_script('document.getElementById("_notiGroundClose").click();'),
+        lambda: sleep(0.5),
         lambda: driver.execute_script('document.getElementById("_DGB_MBS_HEADER_LOGIN").click();'),
         lambda: sleep(1),
         lambda: driver.execute_script('document.getElementById("idTab").click();'),
