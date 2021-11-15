@@ -1,17 +1,17 @@
-import { Component } from 'react';
-import { Button, Modal } from 'react-bootstrap';
-import firebase from 'firebase/app';
+import React, { Component } from "react";
+import { Button, Modal } from "react-bootstrap";
+import firebase from "firebase/app";
 import {
   number_format,
   format_curr,
   format_timestamp,
-} from './DataViewer.style';
-import { BsFillTrashFill, BsPencil, BsCheck, BsX } from 'react-icons/bs';
+} from "./DataViewer.style";
+import { BsFillTrashFill, BsPencil, BsCheck, BsX } from "react-icons/bs";
 class ReceiptEditor extends Component {
   state = {
     content: [
       {
-        name: '민트초코',
+        name: "민트초코",
         value: 3000,
         count: 2,
       },
@@ -44,7 +44,7 @@ class ReceiptEditor extends Component {
   appendRow() {
     const content = this.state.content;
     content.push({
-      name: '',
+      name: "",
       value: 0,
       count: 1,
     });
@@ -81,13 +81,13 @@ class ReceiptEditor extends Component {
       <Modal show={this.props.show} onHide={this.props.onHide}>
         {receipt !== null && (
           <div>
-            <Modal.Header className='d-flex flex-column'>
-              <Modal.Title children='영수증' />
+            <Modal.Header className="d-flex flex-column">
+              <Modal.Title children="영수증" />
               <br />
               <table>
                 <thead
-                  children={['시간', '변동', '노트', '태그'].map((text) => (
-                    <th children={text} className='border text-center' />
+                  children={["시간", "변동", "노트", "태그"].map((text) => (
+                    <th children={text} className="border text-center" />
                   ))}
                 />
                 <tbody
@@ -99,23 +99,23 @@ class ReceiptEditor extends Component {
                         receipt.tran.note,
                         receipt.tran.tag,
                       ].map((content) => (
-                        <td children={content} className='border' />
+                        <td children={content} className="border" />
                       ))}
                     />
                   }
                 />
               </table>
             </Modal.Header>
-            <Modal.Body className='d-flex w-100 justify-content-center'>
+            <Modal.Body className="d-flex w-100 justify-content-center">
               <table>
                 <thead>
                   <tr>
                     <th />
-                    {['상품명', '단가', '수량', '금액'].map((text) => (
+                    {["상품명", "단가", "수량", "금액"].map((text) => (
                       <th
                         key={text}
                         children={text}
-                        className='border text-center'
+                        className="border text-center"
                       />
                     ))}
                   </tr>
@@ -127,43 +127,43 @@ class ReceiptEditor extends Component {
                         children={
                           <Button
                             children={<BsFillTrashFill />}
-                            size='sm'
-                            variant='danger'
-                            className='p-0'
+                            size="sm"
+                            variant="danger"
+                            className="p-0"
                             onClick={() => this.deleteRow(idx)}
                           />
                         }
                       />
                       <td
                         children={name}
-                        className='border text-center'
+                        className="border text-center"
                         onClick={() =>
-                          this.askAndSet('상품명', name, (data) =>
+                          this.askAndSet("상품명", name, (data) =>
                             this.updateRow(idx, { name: data })
                           )
                         }
                       />
                       <td
                         children={number_format.format(value)}
-                        className='border text-right'
+                        className="border text-right"
                         onClick={() =>
-                          this.askAndSet('단가', value, (data) =>
+                          this.askAndSet("단가", value, (data) =>
                             this.updateRow(idx, { value: data })
                           )
                         }
                       />
                       <td
                         children={number_format.format(count)}
-                        className='border text-right'
+                        className="border text-right"
                         onClick={() =>
-                          this.askAndSet('수량', count, (data) =>
+                          this.askAndSet("수량", count, (data) =>
                             this.updateRow(idx, { count: data })
                           )
                         }
                       />
                       <td
                         children={number_format.format(value * count)}
-                        className='border text-right text-weight-bold'
+                        className="border text-right text-weight-bold"
                         dummy={(sum += value * count)}
                       />
                     </tr>
@@ -175,24 +175,24 @@ class ReceiptEditor extends Component {
                         <Button
                           children={<BsPencil />}
                           onClick={() => this.appendRow()}
-                          size='sm'
-                          variant='success'
-                          className='p-0'
+                          size="sm"
+                          variant="success"
+                          className="p-0"
                         />
                       }
                     />
                     <th
-                      children='합계'
-                      colSpan='3'
-                      className='border text-center'
+                      children="합계"
+                      colSpan="3"
+                      className="border text-center"
                     />
                     <th
                       children={number_format.format(sum)}
                       className={
-                        'border text-center' +
+                        "border text-center" +
                         (Math.round(sum + receipt.tran.delta) === 0
-                          ? ''
-                          : ' text-danger')
+                          ? ""
+                          : " text-danger")
                       }
                     />
                   </tr>
@@ -201,12 +201,12 @@ class ReceiptEditor extends Component {
             </Modal.Body>
             <Modal.Footer>
               <Button
-                variant='danger'
+                variant="danger"
                 onClick={this.props.onHide}
                 children={<BsX />}
               />
               <Button
-                variant='primary'
+                variant="primary"
                 disabled={
                   Math.round(sum + Number(receipt.tran.delta)) !== 0 &&
                   receipt.content.length > 0

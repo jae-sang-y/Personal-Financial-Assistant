@@ -1,15 +1,15 @@
-import { Component } from 'react';
+import React, { Component } from "react";
 
-import firebase from 'firebase/app';
-import { Card, ButtonGroup, Button } from 'react-bootstrap';
-import { formatKorean } from './DataViewer.style';
-import moment from 'moment';
-import { Doughnut } from 'react-chartjs-2';
+import firebase from "firebase/app";
+import { Card, ButtonGroup, Button, CardGroup } from "react-bootstrap";
+import { formatKorean } from "./DataViewer.style";
+import moment from "moment";
+import { Doughnut } from "react-chartjs-2";
 
 class DataAnalyzer extends Component {
   state = {
-    target_yy: '21',
-    target_mm: moment().format('MM'),
+    target_yy: "21",
+    target_mm: moment().format("MM"),
     target_tag: null,
     stats: null,
   };
@@ -39,7 +39,7 @@ class DataAnalyzer extends Component {
     g += base;
     b += base;
 
-    if (name === 'undefined') {
+    if (name === "undefined") {
       r = 255;
       g = 0;
       b = 255;
@@ -52,11 +52,16 @@ class DataAnalyzer extends Component {
     const transByTag = {};
     const statByReciept = {};
     const statByFixedLoss = { value: 0 };
+    let statByLoss = 0;
+    let statByIncome = 0;
 
     Object.values(trans).forEach((tran) => {
       if (tran.delta < 0) {
-        if (tran.tag === '고정지출') {
+        if (tran.tag === "고정지출") {
           statByFixedLoss.value += -tran.delta;
+        }
+        if (tran.tag !== "외화매수") {
+          statByLoss -= tran.delta;
         }
         if (tran.receipt !== undefined) {
           tran.receipt.forEach(({ value, name, count }) => {
@@ -82,10 +87,12 @@ class DataAnalyzer extends Component {
         statByTag[tran.tag].count += 1;
         statByTag[tran.tag].value += -tran.delta;
         transByTag[tran.tag].push({
-          timestamp: moment(tran.timestamp).format('DD[일][(]ddd[)] HH[:]mm'),
+          timestamp: moment(tran.timestamp).format("DD[일][(]ddd[)] HH[:]mm"),
           value: tran.delta,
           note: tran.note,
         });
+      } else {
+        statByIncome += tran.delta;
       }
     });
 
@@ -114,7 +121,7 @@ class DataAnalyzer extends Component {
           return {
             tag: tag,
             percent:
-              Math.round((statByTag[tag].value / sumOfStatByTag) * 100) + '%',
+              Math.round((statByTag[tag].value / sumOfStatByTag) * 100) + "%",
             value: statByTag[tag].value,
           };
         }),
@@ -126,6 +133,8 @@ class DataAnalyzer extends Component {
       ),
       datasetOfStatByTag: datasetOfStatByTag,
       statByFixedLoss: statByFixedLoss,
+      statByLoss: statByLoss,
+      statByIncome: statByIncome,
       statByReciept: Object.fromEntries(
         Object.entries(statByReciept).sort(
           ([_0, a], [_1, b]) => b.value - a.value
@@ -135,7 +144,7 @@ class DataAnalyzer extends Component {
   }
 
   componentDidMount() {
-    const ref_transactions = firebase.app().database().ref('transactions/');
+    const ref_transactions = firebase.app().database().ref("transactions/");
     ref_transactions.get().then((d) => {
       const trans_by_month = Object.entries(d.val()).filter(
         (e) => e[0].substr(2, 2) === this.state.target_yy
@@ -152,7 +161,7 @@ class DataAnalyzer extends Component {
   }
 
   renderStatByMonth(m) {
-    const mm = (m < 10 ? '0' : '') + m.toString();
+    const mm = (m < 10 ? "0" : "") + m.toString();
 
     let stat = null;
     if (this.state.stats !== null) {
@@ -160,29 +169,29 @@ class DataAnalyzer extends Component {
     }
     return (
       <Card
-        className='border m-2'
-        style={{ width: 'calc(25% - 1.5rem)' }}
+        className="border m-2"
+        style={{ width: "calc(25% - 1.5rem)" }}
         onClick={() => this.setState({ target_mm: mm })}
       >
         {`${m}월`}
         {stat === null ? (
           <div
-            className='text-secondary my-auto pb-4'
-            style={{ fontSize: '1.3vmin' }}
+            className="text-secondary my-auto pb-4"
+            style={{ fontSize: "1.3vmin" }}
           >
             데이터 없음
           </div>
         ) : (
           <div>
-            <table className='mx-auto mb-1 border rounded'>
+            <table className="mx-auto mb-1 border rounded">
               <tbody>
                 {stat.topListOfStatByTag.map(({ tag, percent, value }) => {
                   return (
                     <tr>
-                      <td className='border' style={{ fontSize: '1.3vmin' }}>
+                      <td className="border" style={{ fontSize: "1.3vmin" }}>
                         {tag}
                       </td>
-                      <td className='border' style={{ fontSize: '1.3vmin' }}>
+                      <td className="border" style={{ fontSize: "1.3vmin" }}>
                         {`${percent}(${formatKorean(value)})`}
                       </td>
                     </tr>
@@ -190,7 +199,7 @@ class DataAnalyzer extends Component {
                 })}
               </tbody>
             </table>
-            <table className='mx-auto mb-1 border rounded'>
+            <table className="mx-auto mb-1 border rounded">
               <tbody>
                 {Object.entries(stat.statByReciept)
                   .slice(0, 3)
@@ -198,24 +207,36 @@ class DataAnalyzer extends Component {
                     return (
                       <tr>
                         <td
-                          className='border'
-                          style={{ fontSize: '1.3vmin' }}
+                          className="border"
+                          style={{ fontSize: "1.3vmin" }}
                         >{`${name}×${count}`}</td>
                         <td
-                          className='border'
-                          style={{ fontSize: '1.3vmin' }}
+                          className="border"
+                          style={{ fontSize: "1.3vmin" }}
                         >{`${formatKorean(Math.round(value))}`}</td>
                       </tr>
                     );
                   })}
               </tbody>
             </table>
-            <Card
-              className='mx-3 mb-1 text-danger'
-              style={{ fontSize: '1.3vmin' }}
-            >
-              {`고정지출: ${formatKorean(stat.statByFixedLoss.value)}`}
-            </Card>
+            <CardGroup className="mx-3 mb-1">
+              <Card className="text-success" style={{ fontSize: "1.3vmin" }}>
+                {`수입: ${formatKorean(stat.statByIncome)}`}
+              </Card>
+              <Card className="text-danger" style={{ fontSize: "1.3vmin" }}>
+                {`지출: ${formatKorean(stat.statByLoss)}`}
+              </Card>
+              <Card
+                className={
+                  stat.statByIncome >= stat.statByLoss
+                    ? "text-success"
+                    : "text-danger"
+                }
+                style={{ fontSize: "1.3vmin" }}
+              >
+                {`순수입: ${formatKorean(stat.statByIncome - stat.statByLoss)}`}
+              </Card>
+            </CardGroup>
           </div>
         )}
       </Card>
@@ -240,9 +261,9 @@ class DataAnalyzer extends Component {
 
   render() {
     return (
-      <div className='d-flex mx-3 my-5 flex-column'>
+      <div className="d-flex mx-3 my-5 flex-column">
         <h5 children={`${this.state.target_yy}년도 종합통계`} />
-        <div className='d-flex align-content-between flex-wrap'>
+        <div className="d-flex align-content-between flex-wrap">
           {[1, 2, 3, 4].map((m) => this.renderStatByMonth(m))}
           {[5, 6, 7, 8].map((m) => this.renderStatByMonth(m))}
           {[9, 10, 11, 12].map((m) => this.renderStatByMonth(m))}
@@ -251,7 +272,7 @@ class DataAnalyzer extends Component {
         {this.state.stats !== null &&
           this.state.stats[this.state.target_mm] !== undefined && (
             <div>
-              <div style={{ minHeight: '80vmin' }}>
+              <div style={{ minHeight: "80vmin" }}>
                 <Doughnut
                   redraw={true}
                   options={{
@@ -264,7 +285,7 @@ class DataAnalyzer extends Component {
                       callbacks: {
                         label: (item, data, x, y, z) =>
                           data.labels[item.index] +
-                          ' ' +
+                          " " +
                           formatKorean(data.datasets[0].data[item.index]),
                       },
                     },
@@ -274,30 +295,30 @@ class DataAnalyzer extends Component {
                   }
                 />
               </div>
-              <div style={{ minHeight: '70vmin' }}>
+              <div style={{ minHeight: "70vmin" }}>
                 <ButtonGroup>
                   {this.state.stats[
                     this.state.target_mm
                   ].datasetOfStatByTag.labels.map((label) => (
                     <Button
                       children={label}
-                      variant='outline-primary'
-                      size='sm'
+                      variant="outline-primary"
+                      size="sm"
                       onClick={() => this.setState({ target_tag: label })}
                     />
                   ))}
                 </ButtonGroup>
                 {this.state.target_tag in
                   this.state.stats[this.state.target_mm].transByTag && (
-                  <table className='mx-auto'>
+                  <table className="mx-auto">
                     <tbody>
                       {this.state.stats[this.state.target_mm].transByTag[
                         this.state.target_tag
                       ].map(({ timestamp, value, note }) => (
                         <tr>
-                          <td className='border'>{timestamp}</td>
-                          <td className='border'>{note}</td>
-                          <td className='border text-danger'>
+                          <td className="border">{timestamp}</td>
+                          <td className="border">{note}</td>
+                          <td className="border text-danger">
                             {formatKorean(value)}
                           </td>
                         </tr>

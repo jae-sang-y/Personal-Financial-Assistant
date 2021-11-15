@@ -1,7 +1,7 @@
-import { Component } from 'react';
-import { Line, defaults } from 'react-chartjs-2';
-import moment from 'moment';
-import { formatKorean, format_curr } from './DataViewer.style';
+import React, { Component } from "react";
+import { Line, defaults } from "react-chartjs-2";
+import moment from "moment";
+import { formatKorean, format_curr } from "./DataViewer.style";
 
 defaults.global.animation.duration = 0;
 
@@ -14,28 +14,28 @@ class MonthChart extends Component {
 
     const balance_dataset = {
       order: 100,
-      label: 'Balance',
+      label: "Balance",
       borderWidth: 2,
       pointRadius: 0,
       pointHitRadius: 15,
-      xAxisID: 'x-axis-1',
-      yAxisID: 'y-axis-1',
-      borderColor: '#7787e3D0',
-      backgroundColor: '#7787e3D0',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-1",
+      borderColor: "#7787e3D0",
+      backgroundColor: "#7787e3D0",
       fill: false,
       data: [],
     };
 
     const expected_balance_dataset = {
       order: 110,
-      label: 'Balance(exp)',
+      label: "Balance(exp)",
       borderWidth: 2,
       pointRadius: 0,
       pointHitRadius: 15,
-      xAxisID: 'x-axis-1',
-      yAxisID: 'y-axis-1',
-      borderColor: '#a7a7e3D0',
-      backgroundColor: '#6777e3D0',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-1",
+      borderColor: "#a7a7e3D0",
+      backgroundColor: "#6777e3D0",
       borderDash: [5, 5],
       fill: false,
       data: [],
@@ -77,16 +77,16 @@ class MonthChart extends Component {
       datasets: [
         balance_dataset,
         {
-          type: 'bar',
+          type: "bar",
           order: 200,
-          label: 'Loss',
+          label: "Loss",
           borderWidth: 1,
           pointRadius: 0,
           pointHitRadius: 15,
-          xAxisID: 'x-axis-1',
-          yAxisID: 'y-axis-1',
-          borderColor: '#e3877780',
-          backgroundColor: '#e3877780',
+          xAxisID: "x-axis-1",
+          yAxisID: "y-axis-1",
+          borderColor: "#e3877780",
+          backgroundColor: "#e3877780",
           fill: false,
           data: Object.values(current.dayStats)
             .filter((dayStat) => dayStat.moment < moment())
@@ -96,13 +96,13 @@ class MonthChart extends Component {
         },
         {
           order: 0,
-          label: 'deltaMoneyPerDay',
+          label: "deltaMoneyPerDay",
           borderWidth: 0,
           pointRadius: 0,
           pointHitRadius: 15,
-          xAxisID: 'x-axis-1',
-          yAxisID: 'y-axis-2',
-          backgroundColor: '#87d387F0',
+          xAxisID: "x-axis-1",
+          yAxisID: "y-axis-2",
+          backgroundColor: "#87d387F0",
           data: Object.values(current.dayStats)
             .filter((dayStat) => dayStat.moment < moment())
             .map((dayStat) => dayStat.deltaMoneyPerDay),
@@ -136,8 +136,8 @@ class MonthChart extends Component {
             scales: {
               xAxes: [
                 {
-                  id: 'x-axis-1',
-                  position: 'bottom',
+                  id: "x-axis-1",
+                  position: "bottom",
                   ticks: {
                     maxTicksLimit: 32,
                     fontSize:
@@ -148,17 +148,17 @@ class MonthChart extends Component {
                   },
                 },
                 {
-                  id: 'x-axis-2',
-                  position: 'bottom',
+                  id: "x-axis-2",
+                  position: "bottom",
                   ticks: {
                     maxTicksLimit: 5,
                     fontSize: 0,
                   },
                   gridLines: {
-                    color: '#808080',
+                    color: "#808080",
                     drawTicks: false,
                     drawBorder: false,
-                    zeroLineColor: 'rgba(0,0,0,0)',
+                    zeroLineColor: "rgba(0,0,0,0)",
                     lineWidth: 1.2,
                   },
                   scaleLabel: {
@@ -172,10 +172,10 @@ class MonthChart extends Component {
 
               yAxes: [
                 {
-                  type: 'linear',
+                  type: "linear",
                   display: true,
-                  position: 'left',
-                  id: 'y-axis-1',
+                  position: "left",
+                  id: "y-axis-1",
                   ticks: {
                     min: 0,
                     stepSize: 50_0000,
@@ -187,16 +187,16 @@ class MonthChart extends Component {
                   grid: { display: false },
                 },
                 {
-                  type: 'linear',
+                  type: "linear",
                   display: true,
-                  position: 'right',
+                  position: "right",
                   ticks: {
                     autoSkip: false,
                     callback: (value) => formatKorean(value),
                     fontSize:
                       Math.min(window.innerWidth, window.innerHeight) * 0.015,
                   },
-                  id: 'y-axis-2',
+                  id: "y-axis-2",
                 },
               ],
             },
@@ -213,14 +213,14 @@ class MonthChart extends Component {
             },
           }}
         />
-        <div className='align-items-center d-flex flex-column'>
+        <div className="align-items-center d-flex flex-column">
           {this.state.targetIndex !== undefined &&
             this.state.targetIndex <
               Object.values(this.props.current.dayStats).length && (
               <table>
                 <thead>
-                  {['시간', '메모', '잔액', '변액'].map((text) => (
-                    <th children={text} className='border' />
+                  {["시간", "메모", "잔액", "변액"].map((text) => (
+                    <th children={text} className="border" />
                   ))}
                 </thead>
                 <tbody>
@@ -230,17 +230,17 @@ class MonthChart extends Component {
                     ].transactions.map((tran) => (
                       <tr>
                         <td
-                          children={moment(tran.timestamp).format('hh[:]mm')}
-                          className='border'
+                          children={moment(tran.timestamp).format("hh[:]mm")}
+                          className="border"
                         />
-                        <td children={tran.note} className='border' />
+                        <td children={tran.note} className="border" />
                         <td
                           children={formatKorean(tran.balance)}
-                          className='border'
+                          className="border"
                         />
                         <td
                           children={format_curr(tran.delta)}
-                          className='border'
+                          className="border"
                         />
                       </tr>
                     ));

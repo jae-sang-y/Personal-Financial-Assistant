@@ -1,33 +1,33 @@
-import { Component } from 'react';
+import React, { Component } from "react";
 
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/database';
-import { FirebaseDatabaseNode } from '@react-firebase/database';
+import firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/database";
+import { FirebaseDatabaseNode } from "@react-firebase/database";
 
-import { Button, ButtonGroup } from 'react-bootstrap';
+import { Button, ButtonGroup } from "react-bootstrap";
 import {
   Cell,
   number_format,
   format_curr,
   format_timestamp,
-} from './DataViewer.style';
-import ReceiptEditor from './ReceiptEditor';
-import moment from 'moment';
+} from "./DataViewer.style";
+import ReceiptEditor from "./ReceiptEditor";
+import moment from "moment";
 
 const ReceiptButton = (props) => {
   return (
     <Button
-      className='p-0'
+      className="p-0"
       variant={
         props.children === undefined
-          ? props.tran.tag === '변동지출'
-            ? 'danger'
-            : 'outline-secondary'
-          : 'outline-primary'
+          ? props.tran.tag === "변동지출"
+            ? "danger"
+            : "outline-secondary"
+          : "outline-primary"
       }
-      size='sm'
-      children={props.children === undefined ? '추가' : '영수증'}
+      size="sm"
+      children={props.children === undefined ? "추가" : "영수증"}
       onClick={() =>
         props.setReceipt({
           tran: props.tran,
@@ -40,34 +40,34 @@ const ReceiptButton = (props) => {
 
 const TransactionOnTable = ({ data, updateTran, targetYM, setReceipt }) => {
   return data.value === null ? (
-    'There are no tracsactions'
+    "There are no tracsactions"
   ) : (
     <div
-      className='border-bottom border-top'
-      style={{ maxHeight: 'calc(100vh - 20rem)', overflowY: 'auto' }}
+      className="border-bottom border-top"
+      style={{ maxHeight: "calc(100vh - 20rem)", overflowY: "auto" }}
     >
       <table
         className={{
-          tableLayout: 'fixed',
+          tableLayout: "fixed",
         }}
       >
         <thead>
           <tr>
-            <th children='시간' className='border text-monospace' />
-            <th children='잔액' className='border text-monospace' />
-            <th children='변동' className='border text-monospace' />
-            <th children='노트' className='border text-monospace' />
-            <th children='태그' className='border text-monospace' />
+            <th children="시간" className="border text-monospace" />
+            <th children="잔액" className="border text-monospace" />
+            <th children="변동" className="border text-monospace" />
+            <th children="노트" className="border text-monospace" />
+            <th children="태그" className="border text-monospace" />
             <th
-              children='영수증'
-              className='border text-monospace'
-              style={{ width: '5rem' }}
+              children="영수증"
+              className="border text-monospace"
+              style={{ width: "5rem" }}
             />
           </tr>
         </thead>
         <tbody>
-          {Object.values(data.value).map((tran, row_k) => (
-            <tr style={{ height: '1rem' }} key={row_k}>
+          {Object.values(data.value || {}).map((tran, row_k) => (
+            <tr style={{ height: "1rem" }} key={row_k}>
               {[
                 [Cell.timestmap, format_timestamp(tran.timestamp)],
                 [Cell.balance, number_format.format(tran.balance)],
@@ -76,14 +76,14 @@ const TransactionOnTable = ({ data, updateTran, targetYM, setReceipt }) => {
                 [
                   Cell.tag,
                   <Button
-                    children={tran.tag || '추가'}
-                    className='p-0 m-0'
-                    size='sm'
+                    children={tran.tag || "추가"}
+                    className="p-0 m-0"
+                    size="sm"
                     variant={
-                      tran.tag === undefined ? 'outline-danger' : 'secondary'
+                      tran.tag === undefined ? "outline-danger" : "secondary"
                     }
                     onClick={() => {
-                      const result = prompt('태그 바꾸기', tran.tag);
+                      const result = prompt("태그 바꾸기", tran.tag);
                       if (result !== null) {
                         updateTran(Object.assign(tran, { tag: result }));
                       }
@@ -94,7 +94,7 @@ const TransactionOnTable = ({ data, updateTran, targetYM, setReceipt }) => {
                 <td
                   key={td_idx}
                   children={<Com children={content} pk={tran.timestamp} />}
-                  className='border'
+                  className="border"
                 />
               ))}
               <td
@@ -106,7 +106,7 @@ const TransactionOnTable = ({ data, updateTran, targetYM, setReceipt }) => {
                     setReceipt={setReceipt}
                   />
                 }
-                className='border'
+                className="border"
               />
             </tr>
           ))}
@@ -118,7 +118,7 @@ const TransactionOnTable = ({ data, updateTran, targetYM, setReceipt }) => {
 
 class DataViewer extends Component {
   state = {
-    targetYM: moment().format('YYYY-MM'),
+    targetYM: moment().format("YYYY-MM"),
     tranOnMonth: {},
     receipt: null,
   };
@@ -131,7 +131,7 @@ class DataViewer extends Component {
     const query = {
       path: `transactions/${new_tran.YYYY_MM}/${new_tran.timestamp}`,
       value: new_tran,
-      type: 'update',
+      type: "update",
     };
     const ref = firebase.app().database().ref(query.path);
     ref.update(query.value);
@@ -141,16 +141,16 @@ class DataViewer extends Component {
     return (
       <div>
         <FirebaseDatabaseNode
-          path='month_of_transactions/'
+          path="month_of_transactions/"
           children={(d) => (
-            <ButtonGroup toggle className='my-3'>
-              <Button size='sm' children='조회연월' variant='outline-dark' />
+            <ButtonGroup toggle className="my-3">
+              <Button size="sm" children="조회연월" variant="outline-dark" />
               {d.value &&
                 Object.entries(d.value).map(([ym]) => (
                   <Button
                     key={ym}
-                    size='sm'
-                    variant='outline-dark'
+                    size="sm"
+                    variant="outline-dark"
                     children={ym}
                     onClick={this.YmButtonOnClick.bind(this, ym)}
                   />
@@ -162,7 +162,7 @@ class DataViewer extends Component {
         {this.state.targetYM === null ? (
           <>Please select taget date</>
         ) : (
-          <div className='w-100 d-flex flex-column align-items-center '>
+          <div className="w-100 d-flex flex-column align-items-center ">
             <FirebaseDatabaseNode
               path={`transactions/${this.state.targetYM}`}
               orderByKey={true}

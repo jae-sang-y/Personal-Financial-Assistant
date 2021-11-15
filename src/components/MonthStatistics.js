@@ -1,21 +1,21 @@
-import { Component } from 'react';
-import { FirebaseDatabaseNode } from '@react-firebase/database';
-import { Button, ButtonGroup } from 'react-bootstrap';
-import { number_format, format_curr } from './DataViewer.style';
+import React, { Component } from "react";
+import { FirebaseDatabaseNode } from "@react-firebase/database";
+import { Button, ButtonGroup } from "react-bootstrap";
+import { number_format, format_curr } from "./DataViewer.style";
 
-import firebase from 'firebase/app';
-import moment from 'moment';
-import MonthChart from './MonthChart';
-import MonthCalendar from './MonthCalendar';
+import firebase from "firebase/app";
+import moment from "moment";
+import MonthChart from "./MonthChart";
+import MonthCalendar from "./MonthCalendar";
 
 const getPayday = (targetYM) => {
   const payday = moment({
     year: targetYM.substr(0, 4),
     month: targetYM.substr(5, 2) - 1,
-    day: '21',
+    day: "21",
   });
   while (payday.weekday() === 0 || payday.weekday() === 6) {
-    payday.subtract(1, 'day');
+    payday.subtract(1, "day");
   }
   return payday;
 };
@@ -25,14 +25,14 @@ const getPrevMonth = (targetYM) => {
     year: targetYM.substr(0, 4),
     month: targetYM.substr(5, 2) - 1,
   });
-  date.subtract(1, 'month');
-  return date.format('YYYY-MM');
+  date.subtract(1, "month");
+  return date.format("YYYY-MM");
 };
 
 const getPayspan = (targetYM) => {
   return {
     begin: getPayday(getPrevMonth(targetYM)),
-    end: getPayday(targetYM).subtract(1, 'milliseconds'),
+    end: getPayday(targetYM).subtract(1, "milliseconds"),
   };
 };
 
@@ -40,12 +40,12 @@ const tranAsRow = (tran) => {
   return (
     <>
       <td
-        children={moment(tran.timestamp).format('hh[:]mm')}
-        className='border'
+        children={moment(tran.timestamp).format("hh[:]mm")}
+        className="border"
       />
-      <td children={tran.note} className='border' />
-      <td children={format_curr(tran.balance)} className='border' />
-      <td children={format_curr(tran.delta)} className='border' />
+      <td children={tran.note} className="border" />
+      <td children={format_curr(tran.balance)} className="border" />
+      <td children={format_curr(tran.delta)} className="border" />
     </>
   );
 };
@@ -54,10 +54,10 @@ class MonthStatistics extends Component {
   state = {
     targetYM:
       moment().date() >= 21
-        ? moment().add({ month: 1 }).format('YYYY-MM')
-        : moment().format('YYYY-MM'),
+        ? moment().add({ month: 1 }).format("YYYY-MM")
+        : moment().format("YYYY-MM"),
     current: {},
-    showMode: 'chart',
+    showMode: "chart",
   };
 
   componentDidMount() {
@@ -82,7 +82,7 @@ class MonthStatistics extends Component {
     let k = 0;
     while (time_stepper < current.paySpan.end) {
       days.push(moment(time_stepper));
-      const mm_dd = time_stepper.format('MM-DD');
+      const mm_dd = time_stepper.format("MM-DD");
       day_stats[mm_dd] = {
         dayFromPayday: k,
         endBalance: null,
@@ -94,7 +94,7 @@ class MonthStatistics extends Component {
         moment: moment(time_stepper),
       };
       k += 1;
-      time_stepper.add(1, 'day');
+      time_stepper.add(1, "day");
     }
 
     const this_month_ret = await firebase
@@ -153,7 +153,7 @@ class MonthStatistics extends Component {
   }
   appendFutureMonth(months) {
     if (moment().date() > 20) {
-      const next_month_key = moment().add({ month: 1 }).format('YYYY-MM');
+      const next_month_key = moment().add({ month: 1 }).format("YYYY-MM");
       if (!(next_month_key in months)) months[next_month_key] = 0;
     }
     return months;
@@ -163,16 +163,16 @@ class MonthStatistics extends Component {
     return (
       <div>
         <FirebaseDatabaseNode
-          path='month_of_transactions/'
+          path="month_of_transactions/"
           children={(d) => (
-            <ButtonGroup toggle className='my-3'>
-              <Button size='sm' children='조회연월' variant='outline-dark' />
+            <ButtonGroup toggle className="my-3">
+              <Button size="sm" children="조회연월" variant="outline-dark" />
               {d.value &&
                 Object.entries(this.appendFutureMonth(d.value)).map(([ym]) => (
                   <Button
                     key={ym}
-                    size='sm'
-                    variant='outline-dark'
+                    size="sm"
+                    variant="outline-dark"
                     children={ym}
                     onClick={() => this.updateTargetYYMM(ym)}
                   />
@@ -180,55 +180,55 @@ class MonthStatistics extends Component {
             </ButtonGroup>
           )}
         />
-        <p children={getPayday(this.state.targetYM).format('YYYY-MM-DD')} />
-        <div className='d-flex container-xl flex-column'>
-          <ButtonGroup className='mx-auto'>
+        <p children={getPayday(this.state.targetYM).format("YYYY-MM-DD")} />
+        <div className="d-flex container-xl flex-column">
+          <ButtonGroup className="mx-auto">
             <Button
-              size='sm'
-              children='테이블'
-              variant='outline-primary'
-              onClick={() => this.setState({ showMode: 'table' })}
+              size="sm"
+              children="테이블"
+              variant="outline-primary"
+              onClick={() => this.setState({ showMode: "table" })}
             />
             <Button
-              size='sm'
-              children='차트'
-              variant='outline-primary'
-              onClick={() => this.setState({ showMode: 'chart' })}
+              size="sm"
+              children="차트"
+              variant="outline-primary"
+              onClick={() => this.setState({ showMode: "chart" })}
             />
             <Button
-              size='sm'
-              children='캘린더'
-              variant='outline-primary'
-              onClick={() => this.setState({ showMode: 'calendar' })}
+              size="sm"
+              children="캘린더"
+              variant="outline-primary"
+              onClick={() => this.setState({ showMode: "calendar" })}
             />
           </ButtonGroup>
-          {current.days && current.dayStats && this.state.showMode === 'table' && (
-            <table className='mx-auto'>
+          {current.days && current.dayStats && this.state.showMode === "table" && (
+            <table className="mx-auto">
               <thead>
                 {[
-                  '일자',
-                  '총 소비',
-                  '말잔',
-                  '가사용금',
-                  '가사용금 변화',
-                  '시간',
-                  '노트',
-                  '잔액',
-                  '변동',
+                  "일자",
+                  "총 소비",
+                  "말잔",
+                  "가사용금",
+                  "가사용금 변화",
+                  "시간",
+                  "노트",
+                  "잔액",
+                  "변동",
                 ].map((text) => (
-                  <th children={text} className='border' />
+                  <th children={text} className="border" />
                 ))}
               </thead>
               <tbody>
                 {current.days.map((day) => {
-                  const dayStat = current.dayStats[day.format('MM-DD')];
+                  const dayStat = current.dayStats[day.format("MM-DD")];
                   const trans = dayStat.transactions;
 
                   return (
                     <>
                       <tr>
                         {[
-                          day.format('MM[/]DD[(]ddd[)]'),
+                          day.format("MM[/]DD[(]ddd[)]"),
                           number_format.format(dayStat.totalLoss),
                           number_format.format(dayStat.endBalance),
                           number_format.format(dayStat.moneyPerDay),
@@ -236,7 +236,7 @@ class MonthStatistics extends Component {
                         ].map((text) => (
                           <td
                             children={text}
-                            className='border text-right'
+                            className="border text-right"
                             rowSpan={dayStat.rowSpan}
                           />
                         ))}
@@ -244,10 +244,10 @@ class MonthStatistics extends Component {
                           tranAsRow(trans[0])
                         ) : (
                           <>
-                            <td children='-' className='border ' />
-                            <td children='-' className='border ' />
-                            <td children='-' className='border ' />
-                            <td children='-' className='border ' />
+                            <td children="-" className="border " />
+                            <td children="-" className="border " />
+                            <td children="-" className="border " />
+                            <td children="-" className="border " />
                           </>
                         )}
                       </tr>
@@ -263,10 +263,10 @@ class MonthStatistics extends Component {
           )}
           {current.days &&
             current.dayStats &&
-            this.state.showMode === 'chart' && <MonthChart current={current} />}
+            this.state.showMode === "chart" && <MonthChart current={current} />}
           {current.days &&
             current.dayStats &&
-            this.state.showMode === 'calendar' && (
+            this.state.showMode === "calendar" && (
               <MonthCalendar current={current} />
             )}
         </div>

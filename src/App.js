@@ -1,27 +1,27 @@
-import './App.css';
+import "./App.css";
 
-import { Component } from 'react';
+import React, { Component } from "react";
 
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/database';
-import { FirebaseAuthProvider } from '@react-firebase/auth';
-import { FirebaseDatabaseProvider } from '@react-firebase/database';
+import firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/database";
+import { FirebaseAuthProvider } from "@react-firebase/auth";
+import { FirebaseDatabaseProvider } from "@react-firebase/database";
 
-import FileUploader from './components/FileUploader';
-import DataViewer from './components/DataViewer';
-import TagManager from './components/TagManager';
-import MonthStatistics from './components/MonthStatistics';
-import TaxCaculator from './components/TaxCaculator';
-import DataAnalyzer from './components/DataAnalyzer';
+import FileUploader from "./components/FileUploader";
+import DataViewer from "./components/DataViewer";
+import TagManager from "./components/TagManager";
+import MonthStatistics from "./components/MonthStatistics";
+import TaxCaculator from "./components/TaxCaculator";
+import DataAnalyzer from "./components/DataAnalyzer";
 
-import { Button } from 'react-bootstrap';
-import { BsCloudUpload } from 'react-icons/bs';
+import { Button } from "react-bootstrap";
+import { BsCloudUpload } from "react-icons/bs";
 
-const config = require('./fireconfig.json');
+const config = require("./fireconfig.json");
 
 const Navigator = ({ state, setState }) => {
-  if (state === undefined) return '';
+  if (state === undefined) return "";
   const SignButton = ({ isSignedIn }) => {
     let signData = null;
     if (isSignedIn === true) {
@@ -29,7 +29,7 @@ const Navigator = ({ state, setState }) => {
         onClick: () => {
           firebase.auth().signOut();
         },
-        children: 'Sign out',
+        children: "Sign out",
       };
     } else {
       signData = {
@@ -37,12 +37,12 @@ const Navigator = ({ state, setState }) => {
           const googleAuthProvider = new firebase.auth.GoogleAuthProvider();
           firebase.auth().signInWithPopup(googleAuthProvider);
         },
-        children: 'Sign in',
+        children: "Sign in",
       };
     }
     return (
       <Button
-        className='h-100 py-0 px-1 bg-transparent border-light'
+        className="h-100 py-0 px-1 bg-transparent border-light"
         {...signData}
       />
     );
@@ -50,33 +50,33 @@ const Navigator = ({ state, setState }) => {
 
   return (
     <div
-      className='bg-dark w-100 p-2 d-flex align-items-center'
-      style={{ height: '3rem' }}
+      className="bg-dark w-100 p-2 d-flex align-items-center"
+      style={{ height: "3rem" }}
     >
       {[
-        'DataViewer',
-        'TagManager',
-        'MonthStatistics',
-        'TaxCaculator',
-        'DataAnalyzer',
+        "DataViewer",
+        "TagManager",
+        "MonthStatistics",
+        "TaxCaculator",
+        "DataAnalyzer",
       ].map((text, pk) => (
         <Button
           active
           key={pk}
           className={
-            'h-100 py-0 px-1 bg-transparent border-0 ' +
-            (text === state.page ? 'font-weight-bold' : '')
+            "h-100 py-0 px-1 bg-transparent border-0 " +
+            (text === state.page ? "font-weight-bold" : "")
           }
-          style={{ boxShadow: 'none' }}
+          style={{ boxShadow: "none" }}
           children={text === state.page ? <u children={text} /> : text}
           onClick={() => setState({ page: text })}
         />
       ))}
 
       <BsCloudUpload
-        as='button'
-        className='text-light ml-auto mr-3 my-1 align-self-end'
-        style={{ width: '1.5rem', height: '1.5rem', cursor: 'pointer' }}
+        as="button"
+        className="text-light ml-auto mr-3 my-1 align-self-end"
+        style={{ width: "1.5rem", height: "1.5rem", cursor: "pointer" }}
         onClick={() => setState({ showFileUploader: true })}
       />
       <SignButton isSignedIn={state.auth.isSignedIn} />
@@ -113,12 +113,12 @@ class App extends Component {
       providerId: null,
     },
     showFileUploader: false,
-    page: 'DataAnalyzer',
+    page: "DataAnalyzer",
   };
 
   render() {
     return (
-      <div className='App'>
+      <div className="App">
         <ImprovedFirebaseAuthProvider
           firebase={firebase}
           {...config}
@@ -146,8 +146,8 @@ class App extends Component {
               )}
               {this.state.auth.isSignedIn === true ? (
                 <div
-                  className='border d-flex flex-column w-100 m-0'
-                  style={{ overflowY: 'auto', height: 'calc(100vh - 3rem)' }}
+                  className="border d-flex flex-column w-100 m-0"
+                  style={{ overflowY: "auto", height: "calc(100vh - 3rem)" }}
                   children={
                     {
                       DataViewer: <DataViewer />,
@@ -159,7 +159,7 @@ class App extends Component {
                   }
                 />
               ) : (
-                <span children={'You have to sign up to access data.'} />
+                <span children={"You have to sign up to access data."} />
               )}
             </div>
           </FirebaseDatabaseProvider>

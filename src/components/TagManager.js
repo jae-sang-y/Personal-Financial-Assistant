@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from "react";
 import {
   Card,
   ListGroup,
@@ -7,54 +7,54 @@ import {
   DropdownButton,
   Dropdown,
   ButtonGroup,
-} from 'react-bootstrap';
+} from "react-bootstrap";
 import {
   FirebaseDatabaseNode,
   FirebaseDatabaseMutation,
-} from '@react-firebase/database';
+} from "@react-firebase/database";
 
-import { BsFillTrashFill } from 'react-icons/bs';
+import { BsFillTrashFill } from "react-icons/bs";
 
 const listgroup_props = {
-  variant: 'flush',
+  variant: "flush",
   style: {
-    height: 'calc(100vh - 12rem)',
-    overflowY: 'auto',
+    height: "calc(100vh - 12rem)",
+    overflowY: "auto",
   },
 };
 
 const card_props = {
   style: {
-    width: 'calc(50vw - 2rem)',
+    width: "calc(50vw - 2rem)",
   },
-  className: 'mx-3',
+  className: "mx-3",
 };
 
 const FilterItem = ({ filter, deleteFilter, changeFilter, key }) => (
   <ListGroup.Item key={key}>
-    <ButtonGroup className='w-100 border rounded border-secondary'>
+    <ButtonGroup className="w-100 border rounded border-secondary">
       <DropdownButton
-        className='border-right-0'
-        variant='outline-secondary'
-        bsPrefix='border-0 btn'
+        className="border-right-0"
+        variant="outline-secondary"
+        bsPrefix="border-0 btn"
         title={filter.type}
         onClick={(e) => {
           if (e.target.text !== undefined)
             changeFilter(filter, { type: e.target.text });
         }}
       >
-        <Dropdown.Item href='#' children='키워드' key='1' />
-        <Dropdown.Item href='#' children='정규식' key='2' />
+        <Dropdown.Item href="#" children="키워드" key="1" />
+        <Dropdown.Item href="#" children="정규식" key="2" />
       </DropdownButton>
       <Button
-        className='px-0 flex-fill'
-        variant='outline-secondary'
+        className="px-0 flex-fill"
+        variant="outline-secondary"
         children={
-          <span style={{ whiteSpace: 'pre' }} children={filter.value} />
+          <span style={{ whiteSpace: "pre" }} children={filter.value} />
         }
-        bsPrefix='w-100 border-top-0 border-bottom-0 rounded-0 btn'
+        bsPrefix="w-100 border-top-0 border-bottom-0 rounded-0 btn"
         onClick={() => {
-          const result = prompt('필터 작성', filter.value);
+          const result = prompt("필터 작성", filter.value);
           if (result !== null) {
             changeFilter(filter, { value: result });
           }
@@ -62,11 +62,11 @@ const FilterItem = ({ filter, deleteFilter, changeFilter, key }) => (
       />
 
       <Button
-        className='pt-0'
-        style={{ maxWidth: '2rem' }}
+        className="pt-0"
+        style={{ maxWidth: "2rem" }}
         children={<BsFillTrashFill />}
-        size='sm'
-        variant='danger'
+        size="sm"
+        variant="danger"
         onClick={() => deleteFilter(filter)}
       />
     </ButtonGroup>
@@ -181,35 +181,35 @@ class TagManager extends Component {
 
   render() {
     return (
-      <div className='d-flex justify-content-center h-100 pt-4 flex-column'>
-        <div className='flex-fill d-flex'>
+      <div className="d-flex justify-content-center h-100 pt-4 flex-column">
+        <div className="flex-fill d-flex">
           <Card {...card_props}>
-            <h5 children='태그' className='font-weight-bold my-1' />
+            <h5 children="태그" className="font-weight-bold my-1" />
             <ListGroup {...listgroup_props}>
               <FirebaseDatabaseNode
-                path='tags/'
+                path="tags/"
                 children={(d) => {
                   if (
                     d.value !== null &&
                     JSON.stringify(this.state.tags) !== JSON.stringify(d.value)
                   )
                     this.setState({ tags: d.value });
-                  return '';
+                  return "";
                 }}
               />
               {Object.entries(this.state.tags).map(([key, value]) => (
-                <ListGroup.Item key={key} className='d-flex'>
+                <ListGroup.Item key={key} className="d-flex">
                   <span
                     children={key}
-                    style={{ cursor: 'pointer' }}
-                    className='ml-auto'
+                    style={{ cursor: "pointer" }}
+                    className="ml-auto"
                     onClick={() => this.chooseTag(key)}
                   />
                   <Button
-                    className='ml-auto pt-0 px-1'
+                    className="ml-auto pt-0 px-1"
                     children={<BsFillTrashFill />}
-                    size='sm'
-                    variant='danger'
+                    size="sm"
+                    variant="danger"
                     onClick={() => this.deleteTag(key)}
                   />
                 </ListGroup.Item>
@@ -220,10 +220,10 @@ class TagManager extends Component {
             <h5
               children={
                 this.state.target_tag_name === undefined
-                  ? '태그를 선택해주세요'
+                  ? "태그를 선택해주세요"
                   : `${this.state.target_tag_name}의 필터`
               }
-              className='font-weight-bold my-1'
+              className="font-weight-bold my-1"
             />
             <ListGroup {...listgroup_props}>
               {this.state.filters.map((filter, pk) => (
@@ -237,38 +237,38 @@ class TagManager extends Component {
             </ListGroup>
           </Card>
         </div>
-        <div className='w-100 d-flex flex-row' style={{ height: '30rem' }}>
-          <div className='w-50 h-100 p-3'>
+        <div className="w-100 d-flex flex-row" style={{ height: "30rem" }}>
+          <div className="w-50 h-100 p-3">
             <FormControl
-              className='w-100 h-100'
-              placeholder='태그 추가'
+              className="w-100 h-100"
+              placeholder="태그 추가"
               onKeyDown={(e) => {
-                if (e.key === 'Enter') {
+                if (e.key === "Enter") {
                   this.insertTag(e.target.value);
-                  e.target.value = '';
+                  e.target.value = "";
                 }
               }}
             />
           </div>
-          <div className='w-50 h-100 p-3'>
+          <div className="w-50 h-100 p-3">
             <FormControl
-              className='w-100 h-100'
-              placeholder='필터 추가'
+              className="w-100 h-100"
+              placeholder="필터 추가"
               onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  this.insertFilter({ type: '키워드', value: e.target.value });
-                  e.target.value = '';
+                if (e.key === "Enter") {
+                  this.insertFilter({ type: "키워드", value: e.target.value });
+                  e.target.value = "";
                 }
               }}
             />
           </div>
         </div>
         <FirebaseDatabaseMutation
-          type='set'
-          path='tags'
+          type="set"
+          path="tags"
           children={({ runMutation }) => {
             this.set_tags = runMutation;
-            return '';
+            return "";
           }}
         />
       </div>

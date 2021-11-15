@@ -1,11 +1,11 @@
-import { Component } from 'react';
+import React, { Component } from "react";
 
-import firebase from 'firebase/app';
-import { formatKorean, format_curr } from './DataViewer.style';
+import firebase from "firebase/app";
+import { formatKorean, format_curr } from "./DataViewer.style";
 
 class TaxCaculator extends Component {
   state = {
-    target_yy: '21',
+    target_yy: "21",
     pre_tax: [],
     pre_tax_sum_amt_real: NaN,
     pre_tax_sum_amt_exp: NaN,
@@ -21,7 +21,7 @@ class TaxCaculator extends Component {
     using_expected: false,
   };
   componentDidMount() {
-    const ref_pre_taxs = firebase.app().database().ref('pre_taxs/');
+    const ref_pre_taxs = firebase.app().database().ref("pre_taxs/");
     ref_pre_taxs.get().then((d) => {
       const pre_tax = Object.entries(d.val()).filter(
         ([YY_MM]) => YY_MM.substr(0, 2) === this.state.target_yy
@@ -50,7 +50,7 @@ class TaxCaculator extends Component {
       });
     });
 
-    const ref_transactions = firebase.app().database().ref('transactions/');
+    const ref_transactions = firebase.app().database().ref("transactions/");
     ref_transactions.get().then((d) => {
       const trans = Object.entries(d.val()).filter(
         (e) => e[0].substr(2, 2) === this.state.target_yy
@@ -58,7 +58,7 @@ class TaxCaculator extends Component {
       const incomes = trans
         .map(([YYYY_MM, trans]) => {
           const incomes_in_month = Object.values(trans)
-            .filter((tran) => tran.tag === '급여')
+            .filter((tran) => tran.tag === "급여")
             .map((tran) => tran.delta);
           const income_amt =
             incomes_in_month.length > 0
@@ -84,7 +84,7 @@ class TaxCaculator extends Component {
 
       const card_loss = trans.map(([YYYY_MM, trans]) => {
         const loss_in_month = Object.values(trans)
-          .filter((tran) => tran.type === 'BC')
+          .filter((tran) => tran.type === "BC")
           .map((tran) => tran.delta);
         const loss_amt =
           loss_in_month.length > 0 ? loss_in_month.reduce((a, b) => a + b) : 0;
@@ -106,7 +106,7 @@ class TaxCaculator extends Component {
 
       const transport_loss = trans.map(([YYYY_MM, trans]) => {
         const loss_in_month = Object.values(trans)
-          .filter((tran) => tran.tag === '교통비')
+          .filter((tran) => tran.tag === "교통비")
           .map((tran) => tran.delta);
         const loss_amt =
           loss_in_month.length > 0 ? loss_in_month.reduce((a, b) => a + b) : 0;
@@ -220,130 +220,130 @@ class TaxCaculator extends Component {
 
   render() {
     const table_pre_tax = (
-      <table className='m-3'>
+      <table className="m-3">
         <tr>
-          <th children='원천징수세액' className='border' colSpan='2' />
+          <th children="원천징수세액" className="border" colSpan="2" />
         </tr>
         {this.state.pre_tax.map(([YY_MM, { amount }]) => (
           <tr>
-            <th children={'20' + YY_MM} className='border' />
-            <td children={format_curr(amount)} className='border' />
+            <th children={"20" + YY_MM} className="border" />
+            <td children={format_curr(amount)} className="border" />
           </tr>
         ))}
         <tr>
-          <th children='원천징수액' className='border' />
+          <th children="원천징수액" className="border" />
           <td
             children={format_curr(this.state.pre_tax_sum_amt_real)}
-            className='border'
+            className="border"
           />
         </tr>
         {this.state.using_expected && (
           <tr>
-            <th children='추정 원천징수액' className='border' />
+            <th children="추정 원천징수액" className="border" />
             <td
               children={format_curr(this.state.pre_tax_sum_amt_exp)}
-              className='border'
+              className="border"
             />
           </tr>
         )}
       </table>
     );
     const table_card_loss = (
-      <table className='m-3'>
+      <table className="m-3">
         <tr>
-          <th children='카드사용금액' className='border' colSpan='2' />
+          <th children="카드사용금액" className="border" colSpan="2" />
         </tr>
         {this.state.card_loss.map(([YYYY_MM, amount]) => (
           <tr>
-            <th children={YYYY_MM} className='border' />
-            <td children={format_curr(amount)} className='border' />
+            <th children={YYYY_MM} className="border" />
+            <td children={format_curr(amount)} className="border" />
           </tr>
         ))}
         <tr>
-          <th children='카드사용금액' className='border' />
+          <th children="카드사용금액" className="border" />
           <td
             children={format_curr(this.state.card_loss_sum_amt_real)}
-            className='border'
+            className="border"
           />
         </tr>
         {this.state.using_expected && (
           <tr>
-            <th children='추정 카드사용금액' className='border' />
+            <th children="추정 카드사용금액" className="border" />
             <td
               children={format_curr(this.state.card_loss_sum_amt_exp)}
-              className='border'
+              className="border"
             />
           </tr>
         )}
         <tr>
-          <th children='산용카드등 소득공제(30%)' className='border' />
+          <th children="산용카드등 소득공제(30%)" className="border" />
           <td
             children={format_curr(Math.round(this.getCardDeduction()))}
-            className='border'
+            className="border"
           />
         </tr>
       </table>
     );
     const table_transport_loss = (
-      <table className='m-3'>
+      <table className="m-3">
         <tr>
-          <th children='교통비' className='border' colSpan='2' />
+          <th children="교통비" className="border" colSpan="2" />
         </tr>
         {this.state.transport_loss.map(([YYYY_MM, amount]) => (
           <tr>
-            <th children={YYYY_MM} className='border' />
-            <td children={format_curr(amount)} className='border' />
+            <th children={YYYY_MM} className="border" />
+            <td children={format_curr(amount)} className="border" />
           </tr>
         ))}
         <tr>
-          <th children='교통비' className='border' />
+          <th children="교통비" className="border" />
           <td
             children={format_curr(this.state.transport_loss_sum_amt_real)}
-            className='border'
+            className="border"
           />
         </tr>
         {this.state.using_expected && (
           <tr>
-            <th children='추정 교통비' className='border' />
+            <th children="추정 교통비" className="border" />
             <td
               children={format_curr(this.state.transport_loss_sum_amt_exp)}
-              className='border'
+              className="border"
             />
           </tr>
         )}
         <tr>
-          <th children='교통비 소득공제(40%)' className='border' />
+          <th children="교통비 소득공제(40%)" className="border" />
           <td
             children={format_curr(Math.round(this.getTransportDeduction()))}
-            className='border'
+            className="border"
           />
         </tr>
       </table>
     );
     const table_incomes = (
-      <table className='m-3'>
+      <table className="m-3">
         <tr>
-          <th children='소득금액' className='border' colSpan='2' />
+          <th children="소득금액" className="border" colSpan="2" />
         </tr>
         {this.state.incomes.map(([YYYY_MM, amount]) => (
           <tr>
-            <th children={YYYY_MM} className='border' />
-            <td children={format_curr(amount)} className='border' />
+            <th children={YYYY_MM} className="border" />
+            <td children={format_curr(amount)} className="border" />
           </tr>
         ))}
         <tr>
-          <th children='근로소득' className='border' />
+          <th children="근로소득" className="border" />
           <td
             children={format_curr(this.state.income_sum_amt_real)}
-            className='border'
+            className="border"
           />
         </tr>
         {this.state.using_expected && (
           <tr>
-            <th children='추정 근로소득' className='border' />
+            <th children="추정 근로소득" className="border" />
             <td
               children={format_curr(this.state.income_sum_amt_exp)}
-              className='border'
+              className="border"
             />
           </tr>
         )}
@@ -351,42 +351,42 @@ class TaxCaculator extends Component {
     );
 
     const table_final = (
-      <table className='m-3'>
+      <table className="m-3">
         <tr>
-          <th children='세액산정' className='border' colSpan='2' />
+          <th children="세액산정" className="border" colSpan="2" />
         </tr>
         {Object.entries({
-          '(A)근로소득': this.state.income_sum_amt_exp,
-          '(B)근로소득 공제액': -Math.round(this.getLaborIncomeDeduction()),
-          '(C)종합소득금액[A - B]': Math.round(this.getTotalIncome()),
-          '(D)종합소득공제': -Math.round(this.getTotalDeduction()),
-          '(E)신용카드사용소득공제': -Math.round(this.getCardDeduction()),
-          '(F)교통비소득공제': -Math.round(this.getTransportDeduction()),
-          '(G)과세표준[C -D,E,F]': Math.round(this.getBaseTax()),
-          '(H)산출세액[from G]': Math.round(this.getCaulatedTax()),
-          '(I)특별세액공제': -Math.round(this.getSpecialDeduction()),
-          '(J)원천징수세액': -Math.round(this.state.pre_tax_sum_amt_exp),
-          '(K)지잔납부세액[H -I,J]': Math.round(this.getFinalDeduction()),
+          "(A)근로소득": this.state.income_sum_amt_exp,
+          "(B)근로소득 공제액": -Math.round(this.getLaborIncomeDeduction()),
+          "(C)종합소득금액[A - B]": Math.round(this.getTotalIncome()),
+          "(D)종합소득공제": -Math.round(this.getTotalDeduction()),
+          "(E)신용카드사용소득공제": -Math.round(this.getCardDeduction()),
+          "(F)교통비소득공제": -Math.round(this.getTransportDeduction()),
+          "(G)과세표준[C -D,E,F]": Math.round(this.getBaseTax()),
+          "(H)산출세액[from G]": Math.round(this.getCaulatedTax()),
+          "(I)특별세액공제": -Math.round(this.getSpecialDeduction()),
+          "(J)원천징수세액": -Math.round(this.state.pre_tax_sum_amt_exp),
+          "(K)지잔납부세액[H -I,J]": Math.round(this.getFinalDeduction()),
         }).map(([tag, amt]) => (
           <tr key={tag}>
-            <th children={tag} className='border' />
-            <td children={formatKorean(amt)} className='border text-right' />
+            <th children={tag} className="border" />
+            <td children={formatKorean(amt)} className="border text-right" />
           </tr>
         ))}
       </table>
     );
 
     return (
-      <div className='d-flex mx-auto mt-5 flex-column'>
+      <div className="d-flex mx-auto mt-5 flex-column">
         <h5 children={`${this.state.target_yy}년도 세금 예상`} />
 
-        <div className='d-flex flex-row'>
+        <div className="d-flex flex-row">
           {table_incomes}
           {table_pre_tax}
           {table_card_loss}
           {table_transport_loss}
         </div>
-        <div className='mx-auto'>{table_final}</div>
+        <div className="mx-auto">{table_final}</div>
       </div>
     );
   }
