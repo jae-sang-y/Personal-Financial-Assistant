@@ -1,2 +1,2 @@
 echo Run on "%cd%"
-python.exe main.py %*
+.venv\Scripts\python.exe main.py %*
